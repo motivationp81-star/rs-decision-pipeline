@@ -255,8 +255,8 @@ var stage = document.getElementById('stageWrap');
 var nodes = [], edges = [], headers = [];
 var colX = [0.13, 0.315, 0.50, 0.685, 0.87];
 /* fake-3D projection: top of the plane compressed (far), bottom full width (near) — works in every renderer */
-function projFX(x, y){ return 0.5 + (x - 0.5) * (0.64 + 0.36 * y); }
-function projFY(y){ return 0.06 + 0.94 * Math.pow(y, 1.24); }
+function projFX(x, y){ return 0.5 + (x - 0.5) * (0.80 + 0.20 * y); }
+function projFY(y){ return 0.06 + 0.94 * Math.pow(y, 1.10); }
 COLS.forEach(function(col, ci){
   var hd = document.createElement('div');
   hd.className = 'colhead mono' + (ci===0?' nl':(ci===4?' nr':'')); hd.style.left = (colX[ci]*100)+'%';
@@ -281,8 +281,8 @@ for (var ci=0; ci<5; ci++){
   var base = ci*NROW;
   for (var ni=0; ni<NROW-1; ni++) link(base+ni, base+ni+1);
   for (var ni2=0; ni2<NROW-1; ni2++){
-    if (ci<4 && (ni2+ci)%2===0) link(base+ni2, base+NROW+ni2+1);
-    if (ci>0 && (ni2+ci)%3===0) link(base+ni2, base-NROW+ni2+1);
+    if (ci<4 && (ni2*2+ci)%4===0) link(base+ni2, base+NROW+ni2+1);
+    if (ci>0 && (ni2+ci)%5===0) link(base+ni2, base-NROW+ni2+1);
   }
 }
 /* starfield */
