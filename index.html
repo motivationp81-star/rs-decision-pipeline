@@ -61,17 +61,20 @@
   .colhead.nl{transform:translateX(0)}
   .colhead.nr{transform:translateX(-100%)}
   .colhead b{color:var(--case);font-weight:800;transition:color .8s}
-  .node{transition:border-color .18s,box-shadow .18s,background .18s;position:absolute;transform:translate(-50%,-50%);font-size:18px;letter-spacing:0;color:#dceaff;white-space:nowrap;text-shadow:0 1px 6px #000;z-index:3;opacity:.95;width:340px;height:84px;padding:14px 18px;background:rgba(5,7,14,.55);border:1px solid var(--case-dim);border-radius:8px;overflow:hidden;box-sizing:border-box;text-overflow:ellipsis}
-  .node::after{content:"";position:absolute;left:11px;bottom:3px;width:16px;height:2px;background:transparent}
+  .node{transition:background .3s,box-shadow .3s,color .3s;position:absolute;transform:translate(-50%,-50%);font-size:19px;letter-spacing:0;color:#e6f1ff;white-space:nowrap;text-shadow:0 1px 6px #000,0 0 14px rgba(0,0,0,.9);z-index:3;opacity:.95;width:330px;height:78px;padding:10px 14px;background:transparent;border:1px solid transparent;border-radius:6px;overflow:hidden;box-sizing:border-box;text-overflow:ellipsis}
+  .node::after{content:"";position:absolute;left:15px;bottom:9px;width:30px;height:2px;background:color-mix(in srgb,var(--case) 55%,transparent);box-shadow:0 0 6px var(--case-dim)}
   #chips .node:nth-child(3n)::after{background:rgba(255,61,139,.55);box-shadow:0 0 6px rgba(255,61,139,.5)}
   .node::before{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;background:#fff;box-shadow:0 0 8px #fff,0 0 14px var(--nc,#fff);margin-right:6px;vertical-align:2px}
   .node small{display:block;font-size:13px;color:var(--mut);margin-left:19px;letter-spacing:.04em;margin-top:5px}
   .node.nl{transform:translate(-50%,-50%)}
   .node.nr{transform:translate(-50%,-50%)}
-  .node em{display:none;font-style:normal}
-  .node.hot{opacity:1;width:340px;height:84px;border:1.6px solid var(--case);background:color-mix(in srgb,var(--case) 22%,rgba(5,7,14,.7));box-shadow:0 0 9px var(--case-dim);z-index:6}
+  .node em{display:block;position:absolute;right:12px;top:9px;width:108px;text-align:right;font-size:12px;line-height:1.5;color:#93b4de;white-space:normal;font-style:normal}
+  .node.hot{opacity:1;width:330px;height:78px;border:1px solid transparent;background:transparent;box-shadow:none;z-index:6}
+  .node.acted{background:linear-gradient(180deg,var(--case),color-mix(in srgb,var(--case) 60%,transparent));color:#0a0f1e;text-shadow:none;box-shadow:0 0 34px var(--case-dim);z-index:6}
+  .node.acted small{color:#23304d}
   #lens{position:absolute;border:2px solid var(--case);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:4;opacity:.5;box-shadow:0 0 22px var(--case-dim),inset 0 0 22px rgba(0,0,0,.3)}
   #activeBox{position:absolute;border:2.5px solid var(--case);border-radius:14px;background:color-mix(in srgb,var(--case) 13%,transparent);box-shadow:0 0 34px var(--case-dim),0 0 12px var(--case-dim),inset 0 0 18px rgba(0,0,0,.35);z-index:2;pointer-events:none}
+  #activeStrip{position:absolute;left:10px;right:10px;bottom:8px;background:var(--case);color:#0a0f1e;font-size:13px;font-weight:700;padding:4px 9px;border-radius:3px;letter-spacing:.04em;white-space:nowrap;overflow:hidden;opacity:0;transition:opacity .3s}
   @keyframes lensPulse{0%,100%{scale:1;opacity:.30}50%{scale:1.05;opacity:.45}}
   .node.hit{border-color:rgba(255,255,255,.75)}
   .node.hot small{color:#ffb3ba}
@@ -105,7 +108,7 @@
   footer b{color:#eaf4ff}
   .demo{color:var(--gold);letter-spacing:.18em}
   @media (max-width:1100px){ .strip{grid-template-columns:1fr 1fr} #stageWrap{height:480px} .casename{font-size:32px} }
-  @media (max-width:1100px){ .node{width:260px;height:64px;font-size:16px;padding:10px 13px} .node small{font-size:12px;margin-left:16px} }
+  @media (max-width:1100px){ .node{width:260px;height:64px;font-size:16px;padding:10px 13px} .node small{font-size:12px;margin-left:16px} .node em{display:none} }
   @media (max-width:640px){ .strip{grid-template-columns:1fr} .stat .val{font-size:24px} #stageWrap{height:430px} .node{width:170px;height:46px;font-size:13px;padding:7px 9px} .node small{font-size:8.5px;margin-left:12px;margin-top:2px} }
 </style>
 </head>
@@ -146,7 +149,7 @@
     <div id="cam">
       <canvas id="web"></canvas>
       <div id="chips"></div>
-      <div id="activeBox"></div>
+      <div id="activeBox"><div id="activeStrip"></div></div>
       <div id="lens"></div>
     </div>
     <div id="wash"></div>
@@ -259,8 +262,8 @@ var stage = document.getElementById('stageWrap');
 var nodes = [], edges = [], headers = [];
 var colX = [0.09, 0.27, 0.45, 0.63, 0.81];
 /* fake-3D projection: top of the plane compressed (far), bottom full width (near) — works in every renderer */
-function projFX(x, y){ return x; }
-function projFY(y){ return y; }
+function projFX(x, y){ return 0.5 + (x - 0.5) * (0.84 + 0.16 * y); }
+function projFY(y){ return 0.05 + 0.95 * Math.pow(y, 1.12); }
 COLS.forEach(function(col, ci){
   var hd = document.createElement('div');
   hd.className = 'colhead mono' + (ci===0?' nl':(ci===4?' nr':'')); hd.style.left = (colX[ci]*100)+'%';
@@ -275,7 +278,8 @@ COLS.forEach(function(col, ci){
     el.style.setProperty('--nc', CASES[0].color);
     el.innerHTML = nd[0] + (nd[1] ? '<small>'+nd[1]+'</small>' : '') + '<em>'+DETAILS[ci][ni]+'</em>';
     chipsEl.appendChild(el);
-    nodes.push({x:x, y:y, col:ci, el:el, tw:Math.random()*6.28, fl:0});
+    el.style.fontSize = (15.5 + ni*0.85)+'px'; el.style.opacity = (0.74 + ni*0.028);
+    nodes.push({x:x, y:y, col:ci, row:ni, el:el, tw:Math.random()*6.28, fl:0});
   });
 });
 /* edges: orderly downward flow — vertical chains in each column + diagonals to the row BELOW only */
@@ -295,7 +299,7 @@ for (var s=0; s<130; s++) stars.push({x:Math.random(), y:Math.random(), r:Math.r
 /* ghost micro-labels — canvas-drawn filler so the field feels dense and organic like the reel */
 var GHOSTWORDS = ["queue check","title len","thumb ok","api ping","log write","spam scan","hold gate","map read","token ok","reply draft","score head","state enc","gate pass","file hash","views chk","dm state","post id","rank in","cost chk","time ist","round no","part no","link out","note save"];
 var ghosts = [];
-for (var gi=0; gi<105; gi++) ghosts.push({x:0.03+Math.random()*0.94, y:0.09+Math.random()*0.86, w:GHOSTWORDS[gi%GHOSTWORDS.length], a:0.22+Math.random()*0.3, ph:Math.random()*6.28});
+for (var gi=0; gi<150; gi++) ghosts.push({x:0.03+Math.random()*0.94, y:0.09+Math.random()*0.86, w:GHOSTWORDS[gi%GHOSTWORDS.length], a:0.22+Math.random()*0.3, ph:Math.random()*6.28});
 
 /* ============ CANVAS ============ */
 var cv = document.getElementById('web'), ctx = cv.getContext('2d');
@@ -322,7 +326,7 @@ function spawnChain(){
   hitFlash(nodes[col*NROW]);
 }
 var curCase = 0, caseClock = 0;
-var abX = 0, abY = 0;
+var abX = 0, abY = 0, lastFocus = null;
 var colCur = [255,42,60], colTgt = [255,42,60];
 function hexRgb(h){ return [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)]; }
 function rgba(c,a){ return 'rgba('+(c[0]|0)+','+(c[1]|0)+','+(c[2]|0)+','+a+')'; }
@@ -425,6 +429,16 @@ function frame(now){
   });
 
 
+  /* one big soft orb riding down each river */
+  bounds.forEach(function(bx, bi){
+    var yy01 = (now*0.00016*(1+bi*0.17) + bi*0.29) % 1;
+    var yy2 = PY(yy01), ph2 = now*0.0016 + bi*1.7;
+    var xx2 = PX(bx, yy01) + Math.sin(yy2*0.011 + ph2)*16;
+    var og = ctx.createRadialGradient(xx2,yy2,0,xx2,yy2,30);
+    og.addColorStop(0,'rgba(255,255,255,0.8)'); og.addColorStop(0.35, rgba(colCur,0.35)); og.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle = og; ctx.beginPath(); ctx.arc(xx2,yy2,30,0,6.283); ctx.fill();
+  });
+
   /* pulses along edges */
   pulses.forEach(function(pu){
     pu.t += pu.sp * pu.dir * (dt/16.7);
@@ -446,6 +460,7 @@ function frame(now){
     ch.t += ch.sp * (dt/16.7);
     if (ch.t>=1){
       focusNode = B;
+      B.el.classList.add('acted'); setTimeout(function(){ B.el.classList.remove('acted'); }, 1250);
       ch.col = ch.tc; ch.row += 1; ch.t = 0; ch.tc = ch.col;
       if (ch.row < NROW-1 && Math.random()<0.35){
         var nc = ch.col + (Math.random()<0.5 ? -1 : 1);
@@ -466,9 +481,9 @@ function frame(now){
     ctx.beginPath(); ctx.moveTo(tail[0],tail[1]); ctx.lineTo(head[0],head[1]); ctx.stroke();
     ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.lineWidth = 4.5;
     ctx.beginPath(); ctx.moveTo(tail[0],tail[1]); ctx.lineTo(head[0],head[1]); ctx.stroke();
-    var hg = ctx.createRadialGradient(head[0],head[1],0,head[0],head[1],26);
-    hg.addColorStop(0,'rgba(255,255,255,0.95)'); hg.addColorStop(0.35, rgba(colCur,0.55)); hg.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle = hg; ctx.beginPath(); ctx.arc(head[0],head[1],26,0,6.283); ctx.fill();
+    var hg = ctx.createRadialGradient(head[0],head[1],0,head[0],head[1],46);
+    hg.addColorStop(0,'rgba(255,255,255,0.95)'); hg.addColorStop(0.35, rgba(colCur,0.5)); hg.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle = hg; ctx.beginPath(); ctx.arc(head[0],head[1],46,0,6.283); ctx.fill();
     ctx.fillStyle = 'rgba(255,255,255,0.9)';
     ctx.beginPath(); ctx.arc(bx, by+4, 4, 0, 6.283); ctx.fill();
   });
@@ -478,13 +493,16 @@ function frame(now){
     abX += (PX(focusNode.x, focusNode.y) - abX) * 0.10;
     abY += (PY(focusNode.y) - abY) * 0.10;
     var ab = document.getElementById('activeBox');
-    var abW = W*0.165, abH = H*0.115;
+    var abW = W*0.185, abH = H*0.135;
     ab.style.left = (abX-abW/2)+'px'; ab.style.top = (abY-abH/2)+'px';
     ab.style.width = abW+'px'; ab.style.height = abH+'px';
     var ln = document.getElementById('lens');
-    var ls = abH*1.5;
+    var ls = abW*1.02;
     ln.style.width = ls+'px'; ln.style.height = ls+'px';
-    ln.style.left = (abX + abW*0.44)+'px'; ln.style.top = (abY - abH*0.12)+'px';
+    ln.style.left = (abX + abW*0.16)+'px'; ln.style.top = abY+'px';
+    var strip = document.getElementById('activeStrip');
+    if (strip && lastFocus !== focusNode){ lastFocus = focusNode; strip.textContent = DETAILS[focusNode.col][focusNode.row]; strip.style.opacity = 0; }
+    if (strip) strip.style.opacity = 1;
   }
 
   /* nodes glow + random flares */
@@ -656,4 +674,4 @@ setInterval(function(){
 </body>
 </html>
 
-<!-- build plane-fit3 -->
+<!-- build anatomy-rebuild -->
