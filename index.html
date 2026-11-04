@@ -50,7 +50,7 @@
   .casesub b{color:var(--case);transition:color .8s}
 
   /* ===== STAGE ===== */
-  #stageWrap{position:relative;height:560px;margin-top:2px;overflow:hidden;border-top:1px solid rgba(120,180,255,.10);border-bottom:1px solid rgba(120,180,255,.10)}
+  #stageWrap{position:relative;height:560px;margin-top:2px;overflow:hidden;border-top:1px solid rgba(120,180,255,.10);border-bottom:1px solid rgba(120,180,255,.10);perspective:1150px;perspective-origin:50% 42%}
   #cam{position:absolute;inset:-30px -40px;will-change:transform}
   #web{position:absolute;inset:0;width:100%;height:100%}
   .colhead{position:absolute;top:8px;transform:translateX(-50%);font-size:10px;letter-spacing:.22em;color:#9fb8dd;white-space:nowrap;z-index:5;text-shadow:0 1px 6px #000}
@@ -63,7 +63,9 @@
   .node.nl{transform:translate(-2%,-50%)}
   .node.nr{transform:translate(-90%,-50%)}
   .node em{display:none;font-style:normal}
-  .node.hot{outline:2px solid var(--case);outline-offset:5px;border-radius:2px;background:rgba(0,0,0,.55);box-shadow:0 0 30px var(--case-dim),inset 0 0 14px rgba(0,0,0,.65);padding:7px 10px;font-size:12px;z-index:6;transition:outline-color .8s,box-shadow .8s}
+  .node.hot{outline:2px solid var(--case);outline-offset:6px;border-radius:3px;background:rgba(8,4,10,.48);box-shadow:0 0 46px var(--case-dim),inset 0 0 22px rgba(0,0,0,.5);padding:11px 15px;font-size:13.5px;z-index:6;transition:outline-color .8s,box-shadow .8s}
+  #lens{position:absolute;width:190px;height:190px;border:2px solid var(--case);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:4;opacity:.85;box-shadow:0 0 34px var(--case-dim),inset 0 0 34px rgba(0,0,0,.35);transition:left 1.4s ease,top 1.4s ease,border-color .8s;animation:lensPulse 3.2s ease-in-out infinite}
+  @keyframes lensPulse{0%,100%{scale:1;opacity:.7}50%{scale:1.07;opacity:.95}}
   .node.hot small{color:#ffb3ba}
   .node.hot em{display:block;font-size:8.5px;color:#cfe2ff;margin-top:3px;letter-spacing:.04em;line-height:1.5}
 
@@ -135,6 +137,7 @@
     <div id="cam">
       <canvas id="web"></canvas>
       <div id="chips"></div>
+      <div id="lens"></div>
     </div>
   </div>
 
@@ -152,7 +155,7 @@
     <div class="panel">
       <h3><b>03</b> USE CASES — <span id="ucCase">case 01</span></h3>
       <div class="usecases" id="ucs"></div>
-      <div class="mono" style="font-size:8.5px;color:#5f718f;margin-top:5px">one decision model · six workflows</div>
+      <div class="mono" style="font-size:8.5px;color:#5f718f;margin-top:5px">one decision model · twelve workflows</div>
     </div>
     <div class="panel">
       <h3><b>04</b> pipeline.py</h3>
@@ -229,7 +232,7 @@ var DETAILS = [
   ["niyam se bada kuch nahi","deal = Vikram ki marzi","ek ruke, baaki chale","garam, insaani jawab","12 atke to badli","aage badhao","kuch book nahi karna"],
   ["API se · public","manager bankar","shabd-ba-shabd save","halat + kataar dono","link ke saath report","turant khabar do","aakhri khabar save"]
 ];
-var UCNAMES = ["upload round","insta reply","part intake","business DM","github check","channel guard"];
+var UCNAMES = ["upload round","insta reply","part intake","business DM","github check","channel guard","comment reply","dm requests","story post","thumbnail check","shorts plan","report pack"];
 var LOGPOOL = [
   ["08:00","round G=11 · pilot first","ok"],["08:01","RASIYA → Part 3 · public","ok"],
   ["08:12","RELEASE · worker claim checked on API","warn"],["08:13","claim galat · koi video nahi","bad"],
@@ -250,10 +253,11 @@ COLS.forEach(function(col, ci){
   hd.innerHTML = col.h.replace(/^(\d+ · )/, '<b>$1</b>');
   stage.appendChild(hd); headers.push({el:hd, ci:ci});
   col.nodes.forEach(function(nd, ni){
-    var x = colX[ci] + (Math.sin(ni*2.7+ci)*0.012);
-    var y = 0.14 + ni*0.12 + Math.sin(ni*1.9+ci*3)*0.014;
+    var x = colX[ci] + Math.sin(ni*2.7+ci)*0.02 + Math.cos(ni*5.1+ci*2)*0.008;
+    var y = 0.14 + ni*0.12 + Math.sin(ni*1.9+ci*3)*0.022;
     var el = document.createElement('div');
     el.className = 'node mono' + (ci===0?' nl':(ci===4?' nr':'')); el.style.left = (x*100)+'%'; el.style.top = (y*100)+'%';
+    el.style.fontSize = (9.6 + ((ni*7+ci*3)%4)*0.7) + 'px';
     el.style.setProperty('--nc', CASES[0].color);
     el.innerHTML = nd[0] + (nd[1] ? '<small>'+nd[1]+'</small>' : '') + '<em>'+DETAILS[ci][ni]+'</em>';
     chipsEl.appendChild(el);
@@ -276,6 +280,10 @@ for (var ci=0; ci<5; ci++){
 /* starfield */
 var stars = [];
 for (var s=0; s<130; s++) stars.push({x:Math.random(), y:Math.random(), r:Math.random()*1.4+0.4, ph:Math.random()*6.28, sp:0.008+Math.random()*0.03});
+/* ghost micro-labels — canvas-drawn filler so the field feels dense and organic like the reel */
+var GHOSTWORDS = ["queue check","title len","thumb ok","api ping","log write","spam scan","hold gate","map read","token ok","reply draft","score head","state enc","gate pass","file hash","views chk","dm state","post id","rank in","cost chk","time ist","round no","part no","link out","note save"];
+var ghosts = [];
+for (var gi=0; gi<105; gi++) ghosts.push({x:0.03+Math.random()*0.94, y:0.05+Math.random()*0.9, w:GHOSTWORDS[gi%GHOSTWORDS.length], a:0.22+Math.random()*0.3, ph:Math.random()*6.28});
 
 /* ============ CANVAS ============ */
 var cv = document.getElementById('web'), ctx = cv.getContext('2d');
@@ -298,7 +306,7 @@ function rgba(c,a){ return 'rgba('+(c[0]|0)+','+(c[1]|0)+','+(c[2]|0)+','+a+')';
 var camX=0.16, camY=0.40, camTX=0.16, camTY=0.40, t0=performance.now();
 var zoomCur=1.07, zoomTgt=1.07;
 var orbs = [];
-for (var ob=0; ob<5; ob++) orbs.push({s:ob%4, y:Math.random(), sp:0.008+Math.random()*0.014, r:26+Math.random()*30, ph:Math.random()*6.28});
+for (var ob=0; ob<5; ob++) orbs.push({s:ob%7, y:Math.random(), sp:0.008+Math.random()*0.014, r:26+Math.random()*30, ph:Math.random()*6.28});
 
 function streamPath(cx, wob, ph){
   ctx.beginPath();
@@ -319,7 +327,8 @@ function frame(now){
   zoomCur += (zoomTgt-zoomCur)*0.016;
   var zoom = zoomCur + Math.sin(now*0.00013)*0.018;
   var cam = document.getElementById('cam');
-  cam.style.transform = 'translate('+((0.5-wx)*52)+'px,'+((0.5-wy)*34)+'px) scale('+zoom+')';
+  var rotX = 8 + Math.sin(now*0.00007)*2.2, rotY = Math.sin(now*0.00005+1.3)*3.6;
+  cam.style.transform = 'translate('+((0.5-wx)*52)+'px,'+((0.5-wy)*34)+'px) scale('+zoom+') rotateX('+rotX+'deg) rotateY('+rotY+'deg)';
 
   ctx.clearRect(0,0,W,H);
   ctx.globalCompositeOperation = 'lighter';
@@ -329,6 +338,16 @@ function frame(now){
     var a = 0.25 + 0.55*Math.abs(Math.sin(now*st.sp*0.06 + st.ph));
     ctx.fillStyle = 'rgba(210,230,255,'+(a*0.8)+')';
     ctx.beginPath(); ctx.arc(st.x*W, st.y*H, st.r, 0, 6.283); ctx.fill();
+  });
+
+  /* ghost micro-labels — dense filler under the web */
+  ctx.font = '7px ui-monospace, Menlo, monospace';
+  ghosts.forEach(function(gh){
+    var ga = gh.a * (0.7 + 0.3*Math.sin(now*0.001 + gh.ph));
+    ctx.fillStyle = 'rgba(255,255,255,'+(ga+0.25)+')';
+    ctx.beginPath(); ctx.arc(gh.x*W, gh.y*H, 1.1, 0, 6.283); ctx.fill();
+    ctx.fillStyle = 'rgba(178,205,245,'+ga+')';
+    ctx.fillText(gh.w, gh.x*W + 5, gh.y*H + 2);
   });
 
   /* web edges — two passes: wide glow underlay + bright core */
@@ -344,12 +363,12 @@ function frame(now){
   });
 
   /* vertical energy streams between columns */
-  var bounds = [0.2225, 0.4075, 0.5925, 0.7775];
+  var bounds = [0.19, 0.295, 0.40, 0.505, 0.61, 0.715, 0.82];
   bounds.forEach(function(bx, bi){
-    var cx = bx*W, ph = now*0.0016 + bi*1.7;
-    ctx.strokeStyle = rgba(colCur, 0.07); ctx.lineWidth = 34; streamPath(cx, 18, ph);
-    ctx.strokeStyle = rgba(colCur, 0.16); ctx.lineWidth = 17; streamPath(cx, 16, ph);
-    ctx.strokeStyle = rgba(colCur, 0.38); ctx.lineWidth = 6.5;  streamPath(cx, 13, ph);
+    var cx = bx*W, ph = now*0.0016 + bi*1.7, sa = (bi%2===0) ? 1 : 0.68;
+    ctx.strokeStyle = rgba(colCur, 0.055*sa+0.02); ctx.lineWidth = 34; streamPath(cx, 18, ph);
+    ctx.strokeStyle = rgba(colCur, 0.13*sa+0.03); ctx.lineWidth = 17; streamPath(cx, 16, ph);
+    ctx.strokeStyle = rgba(colCur, 0.34*sa+0.06); ctx.lineWidth = 6.5;  streamPath(cx, 13, ph);
     ctx.strokeStyle = 'rgba(255,255,255,0.92)'; ctx.lineWidth = 2.2; streamPath(cx, 10, ph);
     /* falling sparks on the stream */
     for (var k=0;k<5;k++){
@@ -460,6 +479,8 @@ function setCase(i){
   var hot = nodes[i*5 + 2]; if (hot) hot.el.classList.add('hot');
   var hot2 = nodes[12 + (i%6)]; if (hot2) hot2.el.classList.add('hot');
   var hot3 = nodes[(i*3 + 24) % nodes.length]; if (hot3) hot3.el.classList.add('hot');
+  var lens = document.getElementById('lens');
+  if (lens && hot2){ lens.style.left = (hot2.x*100)+'%'; lens.style.top = (hot2.y*100)+'%'; lens.style.borderColor = cs.color; }
   zoomTgt = cs.zoom;
   Array.prototype.forEach.call(ucWrap.children, function(el, j){ el.classList.toggle('on', j===i); });
   traceTimer = 30;
