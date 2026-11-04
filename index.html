@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RS / DECISION PIPELINE</title>
+<style>
+  :root{
+    --case:#ff2a3c; --case-dim:rgba(255,42,60,.55);
+    --bg:#010102; --ink:#e8f4ff; --mut:#7d8aa0;
+    --cyan:#25e6ff; --pink:#ff3d8b; --gold:#ffd23e; --green:#3dff7a; --violet:#b26bff; --white:#ffffff;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:var(--bg);color:var(--ink);font-family:"Segoe UI",Arial,sans-serif;overflow-x:hidden}
+  body{background:radial-gradient(1200px 700px at 50% -10%,rgba(40,60,120,.14),transparent 60%),#010102}
+  .mono{font-family:ui-monospace,"Cascadia Mono",Consolas,Menlo,monospace}
+  #app{max-width:1560px;margin:0 auto;padding:10px 14px 6px;position:relative}
+
+  /* ===== TOP HUD ===== */
+  header{display:flex;align-items:flex-start;gap:18px;border-bottom:1px solid rgba(120,180,255,.16);padding-bottom:8px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:10px;min-width:230px}
+  .swirl{width:30px;height:30px;flex:0 0 30px;animation:spin 9s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .brand h1{font-size:19px;letter-spacing:.14em;font-weight:800;white-space:nowrap}
+  .brand h1 b{color:var(--case);transition:color .8s}
+  .brand small{display:block;font-size:8.5px;letter-spacing:.28em;color:var(--mut);font-weight:400}
+  .stats{display:flex;gap:26px;flex:1;justify-content:center;flex-wrap:wrap}
+  .stat{text-align:left}
+  .stat .lab{font-size:8px;letter-spacing:.24em;color:var(--mut)}
+  .stat .val{font-size:31px;font-weight:800;line-height:1.02;font-variant-numeric:tabular-nums}
+  .stat .val.pink{color:var(--pink)} .stat .val.green{color:var(--green)}
+  .stat .sub{font-size:8.5px;color:var(--mut);letter-spacing:.08em}
+  .spark{display:inline-block;vertical-align:middle;margin-left:6px}
+  .tabs{display:flex;gap:6px;align-items:center;padding-top:8px}
+  .tabs span{font-size:9px;letter-spacing:.18em;padding:4px 9px;border:1px solid rgba(140,180,255,.35);border-radius:3px;color:#bcd6ff}
+  .tabs span.on{background:var(--case);border-color:var(--case);color:#fff;transition:background .8s}
+  .profiles{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 2px}
+  .profiles .p{font-size:9.5px;letter-spacing:.06em;padding:3px 8px;border:1px solid rgba(140,180,255,.22);border-radius:20px;color:#a9c6ee;background:rgba(20,30,55,.35)}
+  .profiles .p b{color:#fff;font-weight:700}
+  .profiles .p i{font-style:normal;color:var(--cyan)}
+
+  /* ===== CASE TITLE ===== */
+  .casehead{display:flex;align-items:center;gap:14px;margin:10px 0 4px;flex-wrap:wrap}
+  .casepill{background:var(--case);color:#fff;font-weight:800;font-size:12px;letter-spacing:.14em;padding:5px 12px;border-radius:3px;box-shadow:0 0 18px var(--case-dim);transition:background .8s}
+  .casename{font-size:44px;font-weight:900;letter-spacing:.02em;line-height:.95;font-family:"Arial Narrow","Segoe UI",Arial,sans-serif;text-transform:uppercase;text-shadow:0 0 26px var(--case-dim);transition:text-shadow .8s}
+  .casesub{font-size:12.5px;color:#c7d8f2;letter-spacing:.05em}
+  .casesub b{color:var(--case);transition:color .8s}
+
+  /* ===== STAGE ===== */
+  #stageWrap{position:relative;height:560px;margin-top:2px;overflow:hidden;border-top:1px solid rgba(120,180,255,.10);border-bottom:1px solid rgba(120,180,255,.10)}
+  #cam{position:absolute;inset:-70px -90px;will-change:transform}
+  #web{position:absolute;inset:0;width:100%;height:100%}
+  .colhead{position:absolute;top:6px;transform:translateX(-50%);font-size:10px;letter-spacing:.22em;color:#9fb8dd;white-space:nowrap}
+  .colhead b{color:var(--case);font-weight:800;transition:color .8s}
+  .node{position:absolute;transform:translate(-50%,-50%);font-size:10.5px;letter-spacing:.03em;color:#dceaff;white-space:nowrap;text-shadow:0 1px 6px #000;z-index:3}
+  .node::before{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;background:#fff;box-shadow:0 0 8px #fff,0 0 14px var(--nc,#fff);margin-right:6px;vertical-align:2px}
+  .node small{display:block;font-size:8px;color:var(--mut);margin-left:11px;letter-spacing:.05em}
+  .node.hot{outline:1.5px solid var(--case);outline-offset:5px;border-radius:2px;background:rgba(0,0,0,.45);box-shadow:0 0 22px var(--case-dim),inset 0 0 12px rgba(0,0,0,.6);padding:3px 7px;transition:outline-color .8s,box-shadow .8s}
+  .node.hot small{color:#ffb3ba}
+
+  /* ===== BOTTOM STRIP ===== */
+  .strip{display:grid;grid-template-columns:1.05fr 1.1fr 1.25fr 1fr .95fr;gap:10px;margin-top:10px}
+  .panel{border:1px solid rgba(120,180,255,.16);background:rgba(8,12,24,.55);padding:7px 9px;min-height:104px;position:relative;overflow:hidden}
+  .panel h3{font-size:9px;letter-spacing:.22em;color:#9fb8dd;margin-bottom:6px;font-weight:700}
+  .panel h3 b{color:var(--case);transition:color .8s}
+  .bar-row{display:flex;align-items:center;gap:7px;font-size:9.5px;color:#c7d8f2;margin:3.5px 0}
+  .bar-row .bl{width:52px;color:#8fa5c4;font-size:8.5px;letter-spacing:.04em}
+  .bar{height:4px;border-radius:2px;box-shadow:0 0 8px currentColor}
+  .bar-row .bv{margin-left:auto;color:#eaf4ff;font-size:9px}
+  #confCanvas{width:100%;height:64px;display:block}
+  .usecases{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+  .uc{font-size:9.5px;padding:4px 6px;border:1px solid rgba(120,180,255,.14);color:#a9c6ee;letter-spacing:.03em;display:flex;gap:5px;align-items:center}
+  .uc .n{color:#5f718f;font-size:8px}
+  .uc.on{border-color:var(--case);color:#fff;background:rgba(255,255,255,.05);box-shadow:0 0 12px var(--case-dim);transition:border-color .8s,box-shadow .8s}
+  .code{font-size:9.3px;line-height:1.5;color:#9fe8b1;white-space:pre-wrap}
+  .code .k{color:#ff7ad9}.code .s{color:#ffd23e}.code .c{color:#5f718f}
+  .split-row{display:flex;align-items:center;gap:6px;font-size:9px;color:#c7d8f2;margin:3px 0}
+  .split-row .cells{margin-left:auto;display:flex;gap:2px}
+  .split-row .cells i{width:9px;height:9px;display:block}
+  .guard{font-size:9.3px;color:#c7d8f2;line-height:1.65}
+  .guard b{color:var(--gold)}
+  #runlog{font-size:9.3px;line-height:1.55;color:#8fe3ff;height:118px;overflow:hidden}
+  #runlog .t{color:#5f718f}
+  #runlog .ok{color:var(--green)} #runlog .warn{color:var(--gold)} #runlog .bad{color:var(--pink)}
+  footer{display:flex;justify-content:space-between;gap:10px;margin-top:8px;padding-top:6px;border-top:1px solid rgba(120,180,255,.14);font-size:9px;letter-spacing:.3em;color:#8fa5c4;flex-wrap:wrap}
+  footer b{color:#eaf4ff}
+  .demo{color:var(--gold);letter-spacing:.18em}
+  @media (max-width:1100px){ .strip{grid-template-columns:1fr 1fr} #stageWrap{height:480px} .casename{font-size:32px} }
+  @media (max-width:640px){ .strip{grid-template-columns:1fr} .stat .val{font-size:24px} #stageWrap{height:430px} .node{font-size:9px} }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="brand">
+      <svg class="swirl" viewBox="0 0 40 40" fill="none"><path d="M20 3a17 17 0 1 1-12 5" stroke="#ff2a3c" stroke-width="3.4" stroke-linecap="round"/><path d="M20 10a10 10 0 1 1-7 3" stroke="#25e6ff" stroke-width="3" stroke-linecap="round"/><circle cx="20" cy="20" r="3.2" fill="#fff"/></svg>
+      <div>
+        <h1>RS <b>/</b> DECISION PIPELINE</h1>
+        <small>SYSTEM ONE · RS-1.0 · ONE MODEL · MANY WORKFLOWS</small>
+      </div>
+    </div>
+    <div class="stats mono">
+      <div class="stat"><div class="lab">DECISIONS · THIS RUN</div><div class="val" id="stDec">61</div><div class="sub">SIM · one loop · 18 000</div></div>
+      <div class="stat"><div class="lab">MEDIAN LATENCY · REPORTED</div><div class="val">~<span id="stLat">256</span><span style="font-size:14px"> MS</span><canvas class="spark" id="sparkCv" width="86" height="22"></canvas></div><div class="sub">public demo · not SLA</div></div>
+      <div class="stat"><div class="lab">COST · 10 000 DECISIONS</div><div class="val pink">≈ $0.42</div><div class="sub">per case · flat</div></div>
+      <div class="stat"><div class="lab">CONFIDENCE · LIVE</div><div class="val green" id="stConf">0.94 <span style="font-size:12px;background:#1d7a38;color:#cbffd9;padding:2px 8px;border-radius:3px;vertical-align:4px">PASS</span></div><div class="sub">calibrate on yours · gate ≥ 0.85</div></div>
+    </div>
+    <div class="tabs mono"><span>STATE</span><span>ASK</span><span class="on" id="tabGate">GATE</span><span>CODE</span></div>
+  </header>
+
+  <div class="profiles mono">
+    <span class="p"><i>IG</i> <b>@rsworldwidemusic</b></span>
+    <span class="p"><i>YT</i> <b>RS RASIYA · RS COMMUNITY · RS STREAMS · RS RELEASE · RS VOCAL · RS TOTAL MUSIC · RS PARTNERS · RS FREE WORLD · MVA Degital Media</b></span>
+    <span class="p"><i>GH</i> <b>Pradeep Meena</b> · motivationp81-star</span>
+    <span class="p"><i>AI</i> <b>Mimu</b></span>
+    <span class="p demo">SIMULATED DEMO</span>
+  </div>
+
+  <div class="casehead">
+    <span class="casepill mono" id="casePill">CASE 01 / 06</span>
+    <span class="casename" id="caseName">Daily Upload Round</span>
+    <span class="casesub mono" id="caseSub">Choice · <b>which part, which channel</b> · gate ≥ rules</span>
+  </div>
+
+  <div id="stageWrap">
+    <div id="cam">
+      <canvas id="web"></canvas>
+      <div id="chips"></div>
+    </div>
+  </div>
+
+  <div class="strip">
+    <div class="panel">
+      <h3><b>01</b> PARALLEL QUESTIONS</h3>
+      <div id="pq"></div>
+      <div class="mono" style="font-size:8.5px;color:#5f718f;margin-top:5px">three answers → one cheap decision</div>
+    </div>
+    <div class="panel">
+      <h3><b>02</b> CONFIDENCE STREAM</h3>
+      <canvas id="confCanvas" width="340" height="64"></canvas>
+      <div class="mono" style="font-size:8.5px;color:#5f718f;margin-top:4px">Choice · Score · Gate — under → human</div>
+    </div>
+    <div class="panel">
+      <h3><b>03</b> USE CASES — <span id="ucCase">case 01</span></h3>
+      <div class="usecases" id="ucs"></div>
+      <div class="mono" style="font-size:8.5px;color:#5f718f;margin-top:5px">one decision model · six workflows</div>
+    </div>
+    <div class="panel">
+      <h3><b>04</b> pipeline.py</h3>
+      <div class="code mono" id="codeBox"></div>
+    </div>
+    <div class="panel">
+      <h3><b>05</b> RUN LOG</h3>
+      <div id="runlog" class="mono"></div>
+    </div>
+    <div class="panel">
+      <h3><b>06</b> THE SPLIT</h3>
+      <div id="split"></div>
+    </div>
+    <div class="panel">
+      <h3><b>07</b> GUARDRAILS</h3>
+      <div class="guard mono">
+        title length <b>≤ 100</b> · checked twice<br>
+        one channel fails → <b>only that channel stops</b><br>
+        <b>never delete</b> anything · originals only<br>
+        deals &amp; prices → <b>Vikram decides</b><br>
+        API-check before <b>any</b> retry
+      </div>
+    </div>
+    <div class="panel">
+      <h3><b>08</b> TODAY · IST</h3>
+      <div class="guard mono" id="todayBox">
+        rounds <b>06:00 → 00:00</b> · every 2h · 9 channels<br>
+        G=11 done · RELEASE got <b>Part 14</b> (substitute)<br>
+        Part 12 = <b>new Sanwariya Seth bhajan</b><br>
+        next debut · <b>12:00 · RS FREE WORLD</b>
+      </div>
+    </div>
+  </div>
+
+  <footer class="mono">
+    <span><b>MUSE</b> DECIDES · <b>VIKRAM</b> APPROVES · <b>API</b> ACTS</span>
+    <span>RS WORLDWIDE MUSIC</span>
+    <span>metrics illustrative · demo feed · no live account connected</span>
+  </footer>
+</div>
+
+<script>
+"use strict";
+/* ============ DATA ============ */
+var COLS = [
+  {h:"01 · STATE / IN", nodes:[
+    ["round clock","06:00 → 00:00"],["new comment","@rsworldwidemusic"],["DM request","pending folder"],
+    ["new video file","Drive link"],["deal inquiry","no price yet"],["token health","9 channels"]]},
+  {h:"02 · TYPED / QUESTIONS", nodes:[
+    ["Choice · reply / hold",""],["Nowl · worth_reply",""],["Score · spam_risk",""],
+    ["Score · title_length","≤ 100"],["Choice · channel",""],["Score · gap_rule","≥ 7 others"]]},
+  {h:"03 · RS / SYSTEM ONE", nodes:[
+    ["state read","rounds file"],["map lookup","G = next"],["title verify","exact match"],
+    ["duplicate check","API first"],["thumbnail check","as supplied"],["parallel questions",""]]},
+  {h:"04 · GATE / ROUTE", nodes:[
+    ["gate ≥ rules",""],["hold · for Vikram","deals only"],["skip · one channel","never all"],
+    ["draft reply","warm · human"],["substitute part","if 12 held"],["route · act",""]]},
+  {h:"05 · CODE / ACTS", nodes:[
+    ["upload · via API","public"],["reply · sent","as manager"],["file · saved","verbatim"],
+    ["log · written","state + queue"],["report · to Vikram","link ke saath"],["alert · raised","gadbad par"]]}
+];
+var CASES = [
+  {name:"Daily Upload Round", sub:'Choice · <b>which part, which channel</b> · gate ≥ rules', color:"#ff2a3c", cam:[0.16,0.40]},
+  {name:"Instagram Reply",    sub:'Choice · <b>reply as manager</b> · spam → hold',          color:"#3dff7a", cam:[0.34,0.58]},
+  {name:"New Part Intake",    sub:'Check · <b>title ≤ 100 · file · thumbnail</b>',           color:"#ffd23e", cam:[0.52,0.36]},
+  {name:"Business Inquiry",   sub:'Gate · <b>no deal without Vikram</b> · draft only',       color:"#ff3d8b", cam:[0.68,0.60]},
+  {name:"GitHub Upkeep",      sub:'Check · <b>metrics · snake · 3D city</b> · weekly',       color:"#25e6ff", cam:[0.84,0.42]},
+  {name:"Channel Guard",      sub:'Rule · <b>one channel stops, never all</b>',              color:"#b26bff", cam:[0.50,0.72]}
+];
+var UCNAMES = ["upload round","insta reply","part intake","business DM","github check","channel guard"];
+var LOGPOOL = [
+  ["08:00","round G=11 · pilot first","ok"],["08:01","RASIYA → Part 3 · public","ok"],
+  ["08:12","RELEASE · worker claim checked on API","warn"],["08:13","claim galat · koi video nahi","bad"],
+  ["08:14","Vikram: 12 ki jagah koi aur","ok"],["08:31","partner deal confirm · Kanak","ok"],
+  ["08:44","Part 12 replaced · title 100/100","ok"],["08:46","RELEASE → Part 14 · public","ok"],
+  ["09:02","github profile · sab links 200","ok"],["09:44","G=16 map fix · RELEASE 14→15","warn"],
+  ["live","comment check · koi naya nahi","ok"],["live","token health · 9/9 OK","ok"]
+];
+
+/* ============ BUILD NODES ============ */
+var chipsEl = document.getElementById('chips');
+var stage = document.getElementById('stageWrap');
+var nodes = [], edges = [];
+var colX = [0.085, 0.285, 0.50, 0.715, 0.915];
+COLS.forEach(function(col, ci){
+  var hd = document.createElement('div');
+  hd.className = 'colhead mono'; hd.style.left = (colX[ci]*100)+'%';
+  hd.innerHTML = col.h.replace(/^(\d+ · )/, '<b>$1</b>');
+  chipsEl.appendChild(hd);
+  col.nodes.forEach(function(nd, ni){
+    var x = colX[ci] + (Math.sin(ni*2.7+ci)*0.012);
+    var y = 0.13 + ni*0.145 + Math.sin(ni*1.9+ci*3)*0.018;
+    var el = document.createElement('div');
+    el.className = 'node mono'; el.style.left = (x*100)+'%'; el.style.top = (y*100)+'%';
+    el.style.setProperty('--nc', CASES[0].color);
+    el.innerHTML = nd[0] + (nd[1] ? '<small>'+nd[1]+'</small>' : '');
+    chipsEl.appendChild(el);
+    nodes.push({x:x, y:y, col:ci, el:el, tw:Math.random()*6.28, fl:0});
+  });
+});
+/* edges: dense web — within column (vertical chains), to next column (fan), cross skips */
+function link(a,b){ edges.push({a:a,b:b, ph:Math.random()*6.28}); }
+for (var ci=0; ci<5; ci++){
+  var base = ci*6;
+  for (var ni=0; ni<5; ni++) link(base+ni, base+ni+1);
+  if (ci<4){
+    for (var a=0; a<6; a++) for (var b=0; b<6; b++){
+      if ((a*7+b*3+ci)%3!==0) link(base+a, base+6+b);
+    }
+    link(base+1, base+12); link(base+4, base+7);
+  }
+}
+/* starfield */
+var stars = [];
+for (var s=0; s<130; s++) stars.push({x:Math.random(), y:Math.random(), r:Math.random()*1.4+0.4, ph:Math.random()*6.28, sp:0.008+Math.random()*0.03});
+
+/* ============ CANVAS ============ */
+var cv = document.getElementById('web'), ctx = cv.getContext('2d');
+var W=0, H=0;
+function fit(){ var r = stage.getBoundingClientRect(); W = cv.width = r.width+180; H = cv.height = r.height+140; }
+fit(); window.addEventListener('resize', fit);
+
+var pulses = [];
+for (var p=0; p<110; p++){
+  var e = edges[(Math.random()*edges.length)|0];
+  pulses.push({e:e, t:Math.random(), sp:0.004+Math.random()*0.011, dir:Math.random()<0.5?1:-1, sz:1+Math.random()*1.8});
+}
+var trace = null, traceTimer = 240;
+var curCase = 0, caseClock = 0;
+var colCur = [255,42,60], colTgt = [255,42,60];
+function hexRgb(h){ return [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)]; }
+function rgba(c,a){ return 'rgba('+(c[0]|0)+','+(c[1]|0)+','+(c[2]|0)+','+a+')'; }
+var camX=0.16, camY=0.40, camTX=0.16, camTY=0.40, t0=performance.now();
+
+function streamPath(cx, wob, ph){
+  ctx.beginPath();
+  for (var y=0; y<=H; y+=14){
+    var x = cx + Math.sin(y*0.011 + ph)*wob + Math.sin(y*0.027 + ph*1.7)*wob*0.4;
+    if (y===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+}
+
+function frame(now){
+  var dt = Math.min(50, now - t0); t0 = now;
+  /* colour morph */
+  for (var i=0;i<3;i++) colCur[i] += (colTgt[i]-colCur[i])*0.045;
+  /* camera: drift to case region + breathing wander */
+  camX += (camTX-camX)*0.012; camY += (camTY-camY)*0.012;
+  var wx = camX + Math.sin(now*0.00011)*0.05, wy = camY + Math.cos(now*0.00009)*0.045;
+  var zoom = 1.16 + Math.sin(now*0.00013)*0.05;
+  var cam = document.getElementById('cam');
+  cam.style.transform = 'translate('+((0.5-wx)*130)+'px,'+((0.5-wy)*90)+'px) scale('+zoom+')';
+
+  ctx.clearRect(0,0,W,H);
+  ctx.globalCompositeOperation = 'lighter';
+
+  /* stars */
+  stars.forEach(function(st){
+    var a = 0.25 + 0.55*Math.abs(Math.sin(now*st.sp*0.06 + st.ph));
+    ctx.fillStyle = 'rgba(210,230,255,'+(a*0.8)+')';
+    ctx.beginPath(); ctx.arc(st.x*W, st.y*H, st.r, 0, 6.283); ctx.fill();
+  });
+
+  /* web edges */
+  ctx.lineWidth = 0.7;
+  edges.forEach(function(e, idx){
+    var A = nodes[e.a], B = nodes[e.b];
+    var ax=A.x*W, ay=A.y*H, bx=B.x*W, by=B.y*H;
+    var mx=(ax+bx)/2 + Math.sin(e.ph)*26, my=(ay+by)/2 + Math.cos(e.ph*1.3)*20;
+    var shimmer = 0.05 + 0.05*Math.sin(now*0.0011 + e.ph);
+    ctx.strokeStyle = rgba(colCur, shimmer + (idx%7===0?0.05:0));
+    ctx.beginPath(); ctx.moveTo(ax,ay); ctx.quadraticCurveTo(mx,my,bx,by); ctx.stroke();
+  });
+
+  /* vertical energy streams between columns */
+  var bounds = [0.185, 0.395, 0.605, 0.815];
+  bounds.forEach(function(bx, bi){
+    var cx = bx*W, ph = now*0.0016 + bi*1.7;
+    ctx.strokeStyle = rgba(colCur, 0.05); ctx.lineWidth = 15; streamPath(cx, 16, ph);
+    ctx.strokeStyle = rgba(colCur, 0.13); ctx.lineWidth = 5;  streamPath(cx, 13, ph);
+    ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 1.3; streamPath(cx, 10, ph);
+    /* falling sparks on the stream */
+    for (var k=0;k<5;k++){
+      var yy = ((now*(0.05+k*0.017) + k*H*0.37 + bi*90) % (H+40)) - 20;
+      var xx = cx + Math.sin(yy*0.011 + ph)*13;
+      var g = ctx.createRadialGradient(xx,yy,0,xx,yy,7);
+      g.addColorStop(0,'rgba(255,255,255,0.95)'); g.addColorStop(0.4, rgba(colCur,0.55)); g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(xx,yy,7,0,6.283); ctx.fill();
+    }
+  });
+
+  /* pulses along edges */
+  pulses.forEach(function(pu){
+    pu.t += pu.sp * pu.dir * (dt/16.7);
+    if (pu.t>1){pu.t=0; pu.e = edges[(Math.random()*edges.length)|0];}
+    if (pu.t<0){pu.t=1; pu.e = edges[(Math.random()*edges.length)|0];}
+    var A = nodes[pu.e.a], B = nodes[pu.e.b];
+    var ax=A.x*W, ay=A.y*H, bx=B.x*W, by=B.y*H;
+    var mx=(ax+bx)/2 + Math.sin(pu.e.ph)*26, my=(ay+by)/2 + Math.cos(pu.e.ph*1.3)*20;
+    var u = pu.t, iu = 1-u;
+    var x = iu*iu*ax + 2*iu*u*mx + u*u*bx, y = iu*iu*ay + 2*iu*u*my + u*u*by;
+    var g2 = ctx.createRadialGradient(x,y,0,x,y,6+pu.sz*2);
+    g2.addColorStop(0,'rgba(255,255,255,0.9)'); g2.addColorStop(0.35, rgba(colCur,0.6)); g2.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle = g2; ctx.beginPath(); ctx.arc(x,y,6+pu.sz*2,0,6.283); ctx.fill();
+  });
+
+  /* nodes glow + random flares */
+  nodes.forEach(function(n){
+    if (Math.random()<0.0016) n.fl = 1;
+    n.fl = Math.max(0, n.fl - 0.012);
+    var tw = 0.55 + 0.45*Math.sin(now*0.002 + n.tw);
+    var r = 2 + n.fl*5 + tw*0.7;
+    var g3 = ctx.createRadialGradient(n.x*W, n.y*H, 0, n.x*W, n.y*H, r*3.2);
+    g3.addColorStop(0,'rgba(255,255,255,'+(0.75+n.fl*0.25)+')');
+    g3.addColorStop(0.3, rgba(colCur, 0.5*tw + n.fl*0.4));
+    g3.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle = g3; ctx.beginPath(); ctx.arc(n.x*W, n.y*H, r*3.2, 0, 6.283); ctx.fill();
+  });
+
+  /* decision path tracing */
+  traceTimer -= dt/16.7;
+  if (!trace && traceTimer<=0){
+    var startCol = (Math.random()*3)|0, path=[startCol*6 + ((Math.random()*6)|0)];
+    for (var c2=startCol; c2<4; c2++){
+      var opts = edges.filter(function(e){ return nodes[e.a]===nodes[path[path.length-1]] && nodes[e.b].col===c2+1; });
+      if (!opts.length) break;
+      path.push(edges.indexOf(opts[(Math.random()*opts.length)|0])>=0 ? nodes.indexOf(nodes[opts[(Math.random()*opts.length)|0].b]) : null);
+    }
+    path = path.filter(function(v){ return v!==null && v!==undefined; });
+    if (path.length>2) trace = {path:path, born:now};
+    traceTimer = 200 + Math.random()*160;
+  }
+  if (trace){
+    var age = (now - trace.born)/2600;
+    if (age>=1){ trace = null; }
+    else{
+      var upto = Math.min(trace.path.length-1, Math.floor(age * trace.path.length * 1.6));
+      ctx.lineWidth = 1.8;
+      for (var ti=0; ti<upto; ti++){
+        var A2 = nodes[trace.path[ti]], B2 = nodes[trace.path[ti+1]];
+        ctx.strokeStyle = 'rgba(255,255,255,'+(0.75*(1-age)+0.2)+')';
+        ctx.shadowColor = rgba(colCur,0.9); ctx.shadowBlur = 12;
+        ctx.beginPath(); ctx.moveTo(A2.x*W, A2.y*H); ctx.lineTo(B2.x*W, B2.y*H); ctx.stroke();
+        ctx.shadowBlur = 0;
+      }
+    }
+  }
+
+  ctx.globalCompositeOperation = 'source-over';
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* ============ CASE CYCLING ============ */
+var pill = document.getElementById('casePill'), cname = document.getElementById('caseName'), csub = document.getElementById('caseSub');
+var ucWrap = document.getElementById('ucs');
+UCNAMES.forEach(function(u, i){
+  var d = document.createElement('div'); d.className = 'uc mono' + (i===0?' on':'');
+  d.innerHTML = '<span class="n">0'+(i+1)+'</span> ' + u;
+  d.style.cursor = 'pointer';
+  d.addEventListener('click', function(){ setCase(i); caseClock = 0; });
+  ucWrap.appendChild(d);
+});
+function setCase(i){
+  curCase = i;
+  var cs = CASES[i];
+  document.documentElement.style.setProperty('--case', cs.color);
+  document.documentElement.style.setProperty('--case-dim', cs.color+'88');
+  pill.textContent = 'CASE 0'+(i+1)+' / 06';
+  cname.textContent = cs.name;
+  csub.innerHTML = cs.sub;
+  document.getElementById('ucCase').textContent = 'case 0'+(i+1);
+  colTgt = hexRgb(cs.color);
+  camTX = cs.cam[0]; camTY = cs.cam[1];
+  nodes.forEach(function(n){ n.el.style.setProperty('--nc', cs.color); n.el.classList.remove('hot'); });
+  var hot = nodes[i*5 + 2]; if (hot) hot.el.classList.add('hot');
+  var hot2 = nodes[12 + (i%6)]; if (hot2) hot2.el.classList.add('hot');
+  Array.prototype.forEach.call(ucWrap.children, function(el, j){ el.classList.toggle('on', j===i); });
+  traceTimer = 30;
+}
+setInterval(function(){ caseClock += 1; if (caseClock >= 8){ caseClock = 0; setCase((curCase+1)%CASES.length); } }, 1000);
+setCase(0);
+
+/* ============ COUNTERS ============ */
+var dec = 61;
+setInterval(function(){
+  dec += 3 + ((Math.random()*22)|0);
+  document.getElementById('stDec').textContent = dec.toLocaleString('en-IN');
+  document.getElementById('stLat').textContent = 248 + ((Math.random()*18)|0);
+  if (Math.random()<0.3) document.getElementById('stConf').firstChild.textContent = (0.88 + Math.random()*0.11).toFixed(2) + ' ';
+}, 700);
+
+/* header sparkline */
+(function(){
+  var c = document.getElementById('sparkCv'), g = c.getContext('2d'), pts = [];
+  for (var i=0;i<26;i++) pts.push(11 + Math.sin(i)*4 + Math.random()*3);
+  setInterval(function(){
+    pts.push(11 + Math.sin(Date.now()*0.004)*4 + Math.random()*3); pts.shift();
+    g.clearRect(0,0,86,22); g.strokeStyle = '#ff3d8b'; g.lineWidth = 1.4; g.beginPath();
+    pts.forEach(function(v,i){ if(i===0) g.moveTo(i*3.4, v); else g.lineTo(i*3.4, v); });
+    g.stroke();
+  }, 220);
+})();
+
+/* ============ CONFIDENCE STREAM ============ */
+(function(){
+  var c = document.getElementById('confCanvas'), g = c.getContext('2d');
+  var cols = ['#ff3d8b','#25e6ff','#3dff7a'], off = [0, 2.1, 4.2];
+  setInterval(function(){
+    g.clearRect(0,0,340,64);
+    cols.forEach(function(col, ci){
+      g.strokeStyle = col; g.lineWidth = 1.3; g.beginPath();
+      for (var x=0; x<=340; x+=4){
+        var y = 32 + Math.sin(x*0.045 + Date.now()*0.0016 + off[ci])*11 + Math.sin(x*0.013 + off[ci]*2 + Date.now()*0.0007)*7;
+        if (x===0) g.moveTo(x,y); else g.lineTo(x,y);
+      }
+      g.stroke();
+    });
+  }, 90);
+})();
+
+/* ============ PANELS ============ */
+(function(){
+  var pq = document.getElementById('pq');
+  var rows = [['Choice A', 88, '#ff3d8b'], ['Choice B', 64, '#25e6ff'], ['Score A', 76, '#3dff7a'], ['Nowl A', 52, '#ffd23e'], ['Nowl B', 33, '#b26bff']];
+  rows.forEach(function(r){
+    var d = document.createElement('div'); d.className = 'bar-row mono';
+    d.innerHTML = '<span class="bl">'+r[0]+'</span><span class="bar" style="width:'+(r[1]*0.9)+'px;background:'+r[2]+';color:'+r[2]+'"></span><span class="bv">'+(r[1]/100).toFixed(2)+'</span>';
+    pq.appendChild(d);
+  });
+  var code = document.getElementById('codeBox');
+  code.innerHTML = '<span class="k">answer</span> = route(choice, gate)\n<span class="k">if</span> answer.confidence >= <span class="s">0.85</span>:\n    act(answer)  <span class="c"># code, not LLM</span>\n<span class="k">else</span>:\n    hold_for_vikram()';
+  var split = document.getElementById('split');
+  var srows = [['Muse decides', 8, '#ff3d8b'], ['Vikram approves', 5, '#ffd23e'], ['API acts', 9, '#25e6ff']];
+  srows.forEach(function(r){
+    var cells = '';
+    for (var i=0;i<10;i++) cells += '<i style="background:'+(i<r[1]?r[2]:'rgba(120,150,200,.18)')+'"></i>';
+    var d = document.createElement('div'); d.className = 'split-row mono';
+    d.innerHTML = '<span>'+r[0]+'</span><span class="cells">'+cells+'</span>';
+    split.appendChild(d);
+  });
+  var log = document.getElementById('runlog'), li = 0;
+  function addLog(){
+    var L = LOGPOOL[li % LOGPOOL.length]; li++;
+    var d = document.createElement('div');
+    d.innerHTML = '<span class="t">'+L[0]+'</span> · <span class="'+L[2]+'">'+L[1]+'</span>';
+    log.appendChild(d);
+    while (log.children.length > 7) log.removeChild(log.firstChild);
+  }
+  for (var j=0;j<5;j++) addLog();
+  setInterval(addLog, 2600);
+})();
+</script>
+</body>
+</html>
