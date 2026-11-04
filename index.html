@@ -61,7 +61,7 @@
   .colhead.nl{transform:translateX(0)}
   .colhead.nr{transform:translateX(-100%)}
   .colhead b{color:var(--case);font-weight:800;transition:color .8s}
-  .node{transition:border-color .18s,box-shadow .18s,background .18s;position:absolute;transform:translate(-50%,-50%);font-size:14px;letter-spacing:.03em;color:#dceaff;white-space:nowrap;text-shadow:0 1px 6px #000;z-index:3;opacity:.95;width:204px;height:54px;padding:9px 12px;background:rgba(5,7,14,.82);border:1px solid var(--case-dim);border-radius:5px;overflow:hidden;box-sizing:border-box;text-overflow:ellipsis}
+  .node{transition:border-color .18s,box-shadow .18s,background .18s;position:absolute;transform:translate(-50%,-50%);font-size:13.5px;letter-spacing:.03em;color:#dceaff;white-space:nowrap;text-shadow:0 1px 6px #000;z-index:3;opacity:.95;width:176px;height:50px;padding:8px 11px;background:rgba(5,7,14,.82);border:1px solid var(--case-dim);border-radius:5px;overflow:hidden;box-sizing:border-box;text-overflow:ellipsis}
   .node::after{content:"";position:absolute;left:11px;bottom:3px;width:16px;height:2px;background:transparent}
   #chips .node:nth-child(3n)::after{background:rgba(255,61,139,.55);box-shadow:0 0 6px rgba(255,61,139,.5)}
   .node::before{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;background:#fff;box-shadow:0 0 8px #fff,0 0 14px var(--nc,#fff);margin-right:6px;vertical-align:2px}
@@ -69,7 +69,7 @@
   .node.nl{transform:translate(-2%,-50%)}
   .node.nr{transform:translate(-90%,-50%)}
   .node em{display:none;font-style:normal}
-  .node.hot{opacity:1;width:204px;height:54px;border:1.6px solid var(--case);background:color-mix(in srgb,var(--case) 30%,rgba(5,7,14,.85));box-shadow:0 0 9px var(--case-dim);z-index:6}
+  .node.hot{opacity:1;width:176px;height:50px;border:1.6px solid var(--case);background:color-mix(in srgb,var(--case) 30%,rgba(5,7,14,.85));box-shadow:0 0 9px var(--case-dim);z-index:6}
   #lens{display:none;position:absolute;width:170px;height:170px;border:2px solid var(--case);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:4;opacity:.38;box-shadow:0 0 16px var(--case-dim),inset 0 0 16px rgba(0,0,0,.35);transition:left 1.4s ease,top 1.4s ease,border-color .8s;animation:lensPulse 3.2s ease-in-out infinite}
   @keyframes lensPulse{0%,100%{scale:1;opacity:.30}50%{scale:1.05;opacity:.45}}
   .node.hit{border-color:rgba(255,255,255,.75)}
@@ -254,9 +254,9 @@ var LOGPOOL = [
 var chipsEl = document.getElementById('chips');
 var stage = document.getElementById('stageWrap');
 var nodes = [], edges = [], headers = [];
-var colX = [0.13, 0.315, 0.50, 0.685, 0.87];
+var colX = [0.115, 0.3075, 0.50, 0.6925, 0.885];
 /* fake-3D projection: top of the plane compressed (far), bottom full width (near) — works in every renderer */
-function projFX(x, y){ return 0.5 + (x - 0.5) * (0.80 + 0.20 * y); }
+function projFX(x, y){ return 0.5 + (x - 0.5) * (0.86 + 0.14 * y); }
 function projFY(y){ return 0.06 + 0.94 * Math.pow(y, 1.10); }
 COLS.forEach(function(col, ci){
   var hd = document.createElement('div');
@@ -268,7 +268,7 @@ COLS.forEach(function(col, ci){
     var y = 0.135 + ni*0.094;
     var el = document.createElement('div');
     el.className = 'node mono' + (ci===0?' nl':(ci===4?' nr':'')); el.style.left = (projFX(x,y)*100)+'%'; el.style.top = (projFY(y)*100)+'%';
-    el.style.fontSize = '14px';
+    el.style.fontSize = '13.5px';
     el.style.setProperty('--nc', CASES[0].color);
     el.innerHTML = nd[0] + (nd[1] ? '<small>'+nd[1]+'</small>' : '') + '<em>'+DETAILS[ci][ni]+'</em>';
     chipsEl.appendChild(el);
@@ -444,7 +444,7 @@ function frame(now){
       }
       return;
     }
-    var ax=PX(A.x,A.y), ay=PY(A.y)+30, bx=PX(B.x,B.y), by=PY(B.y)-30;
+    var ax=PX(A.x,A.y), ay=PY(A.y)+28, bx=PX(B.x,B.y), by=PY(B.y)-28;
     var mx=(ax+bx)/2 + (ch.tc!==ch.col ? (bx-ax)*0.10 : 7), my=(ay+by)/2;
     function cpos(u){ var iu=1-u; return [iu*iu*ax + 2*iu*u*mx + u*u*bx, iu*iu*ay + 2*iu*u*my + u*u*by]; }
     /* exit port: a bright dot ON the source box's bottom edge, where the line leaves the box */
@@ -637,4 +637,4 @@ setInterval(function(){
 </body>
 </html>
 
-<!-- build c3df4495 retry -->
+<!-- build fit-names -->
