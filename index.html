@@ -33,7 +33,11 @@
   .spark{display:inline-block;vertical-align:middle;margin-left:6px}
   .tickbar{display:flex;gap:2px;margin:4px 0 3px}
   .tickbar i{width:7px;height:5px;background:rgba(130,160,210,.16);display:block}
-  .tickbar i.on{background:var(--pink);box-shadow:0 0 6px rgba(255,61,139,.8)}
+  .tickbar i.on{background:var(--case);box-shadow:0 0 6px var(--case-dim);transition:background .8s}
+  .confgauge{position:relative;height:4px;background:rgba(130,160,210,.18);margin:6px 0 3px;width:158px}
+  .confgauge i{position:absolute;left:0;top:0;bottom:0;background:var(--green);width:94%;transition:width .5s,background .5s}
+  .confgauge em{position:absolute;left:85%;top:-3px;width:2px;height:10px;background:#fff;opacity:.75}
+  #wash{position:absolute;inset:0;pointer-events:none;background:radial-gradient(62% 58% at 50% 44%,var(--case-dim),transparent 72%);opacity:.17;mix-blend-mode:screen;z-index:2;transition:background .8s}
   .tabs{display:flex;gap:6px;align-items:center;padding-top:8px}
   .tabs span{font-size:9px;letter-spacing:.18em;padding:4px 9px;border:1px solid rgba(140,180,255,.35);border-radius:3px;color:#bcd6ff}
   .tabs span.on{background:var(--case);border-color:var(--case);color:#fff;transition:background .8s}
@@ -57,13 +61,15 @@
   .colhead.nl{transform:translateX(0)}
   .colhead.nr{transform:translateX(-100%)}
   .colhead b{color:var(--case);font-weight:800;transition:color .8s}
-  .node{position:absolute;transform:translate(-50%,-50%);font-size:10.5px;letter-spacing:.03em;color:#dceaff;white-space:nowrap;text-shadow:0 1px 6px #000;z-index:3}
+  .node{position:absolute;transform:translate(-50%,-50%);font-size:10.5px;letter-spacing:.03em;color:#dceaff;white-space:nowrap;text-shadow:0 1px 6px #000;z-index:3;opacity:.86}
+  .node::after{content:"";position:absolute;left:11px;bottom:-5px;width:16px;height:2px;background:transparent}
+  #chips .node:nth-child(3n)::after{background:rgba(255,61,139,.55);box-shadow:0 0 6px rgba(255,61,139,.5)}
   .node::before{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;background:#fff;box-shadow:0 0 8px #fff,0 0 14px var(--nc,#fff);margin-right:6px;vertical-align:2px}
   .node small{display:block;font-size:8px;color:var(--mut);margin-left:11px;letter-spacing:.05em}
   .node.nl{transform:translate(-2%,-50%)}
   .node.nr{transform:translate(-90%,-50%)}
   .node em{display:none;font-style:normal}
-  .node.hot{outline:2px solid var(--case);outline-offset:6px;border-radius:3px;background:rgba(8,4,10,.48);box-shadow:0 0 46px var(--case-dim),inset 0 0 22px rgba(0,0,0,.5);padding:11px 15px;font-size:13.5px;z-index:6;transition:outline-color .8s,box-shadow .8s}
+  .node.hot{opacity:1;border:2px solid var(--case);border-radius:3px;background:linear-gradient(180deg,var(--case-dim),rgba(0,0,0,.30));box-shadow:0 0 55px var(--case-dim),0 0 18px var(--case-dim),inset 0 0 18px rgba(0,0,0,.35);padding:11px 15px;font-size:13.5px;z-index:6;text-shadow:0 0 8px rgba(0,0,0,.9),0 1px 4px #000;transition:border-color .8s,box-shadow .8s}
   #lens{position:absolute;width:190px;height:190px;border:2px solid var(--case);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:4;opacity:.85;box-shadow:0 0 34px var(--case-dim),inset 0 0 34px rgba(0,0,0,.35);transition:left 1.4s ease,top 1.4s ease,border-color .8s;animation:lensPulse 3.2s ease-in-out infinite}
   @keyframes lensPulse{0%,100%{scale:1;opacity:.7}50%{scale:1.07;opacity:.95}}
   .node.hot small{color:#ffb3ba}
@@ -114,7 +120,7 @@
       <div class="stat"><div class="lab">DECISIONS · THIS RUN</div><div class="val" id="stDec">61</div><div class="tickbar" id="decBar"></div><div class="sub">SIM · one loop · 18 000</div></div>
       <div class="stat"><div class="lab">MEDIAN LATENCY · REPORTED</div><div class="val">~<span id="stLat">256</span><span style="font-size:14px"> MS</span><canvas class="spark" id="sparkCv" width="86" height="22"></canvas></div><div class="sub">public demo · not SLA</div></div>
       <div class="stat"><div class="lab">COST · 10 000 DECISIONS</div><div class="val pink">≈ $0.42</div><div class="sub">per case · flat</div></div>
-      <div class="stat"><div class="lab">CONFIDENCE · LIVE</div><div class="val green" id="stConf"><span id="confVal">0.94</span> <span id="confPill" style="font-size:12px;background:#1d7a38;color:#cbffd9;padding:2px 8px;border-radius:3px;vertical-align:4px">PASS</span></div><div class="sub">calibrate on yours · gate ≥ 0.85</div></div>
+      <div class="stat"><div class="lab">CONFIDENCE · LIVE</div><div class="val green" id="stConf"><span id="confVal">0.94</span> <span id="confPill" style="font-size:12px;background:#1d7a38;color:#cbffd9;padding:2px 8px;border-radius:3px;vertical-align:4px">PASS</span></div><div class="confgauge"><i id="confFill"></i><em></em></div><div class="sub">calibrate on yours · gate ≥ 0.85</div></div>
     </div>
     <div class="tabs mono"><span>STATE</span><span>ASK</span><span class="on" id="tabGate">GATE</span><span>CODE</span></div>
   </header>
@@ -139,6 +145,7 @@
       <div id="chips"></div>
       <div id="lens"></div>
     </div>
+    <div id="wash"></div>
   </div>
 
   <div class="strip">
@@ -368,7 +375,7 @@ function frame(now){
     var shimmer = 0.30 + 0.10*Math.sin(now*0.0011 + e.ph) + (idx%7===0?0.12:0);
     ctx.strokeStyle = rgba(colCur, shimmer*0.30); ctx.lineWidth = 3.2;
     ctx.beginPath(); ctx.moveTo(ax,ay); ctx.quadraticCurveTo(mx,my,bx,by); ctx.stroke();
-    ctx.strokeStyle = rgba(colCur, shimmer); ctx.lineWidth = 1.2;
+    ctx.strokeStyle = (idx%9===4) ? 'rgba(255,61,139,'+(shimmer*0.85)+')' : rgba(colCur, shimmer); ctx.lineWidth = 1.2;
     ctx.beginPath(); ctx.moveTo(ax,ay); ctx.quadraticCurveTo(mx,my,bx,by); ctx.stroke();
   });
 
@@ -380,6 +387,9 @@ function frame(now){
     ctx.strokeStyle = rgba(colCur, 0.13*sa+0.03); ctx.lineWidth = 17; streamPath(bx, 16, ph);
     ctx.strokeStyle = rgba(colCur, 0.34*sa+0.06); ctx.lineWidth = 6.5;  streamPath(bx, 13, ph);
     ctx.strokeStyle = 'rgba(255,255,255,0.92)'; ctx.lineWidth = 2.2; streamPath(bx, 10, ph);
+    /* braided companion strands winding around the core */
+    ctx.strokeStyle = rgba(colCur, 0.30*sa+0.05); ctx.lineWidth = 1.6; streamPath(bx, 23, ph+2.1);
+    ctx.strokeStyle = rgba(colCur, 0.24*sa+0.04); ctx.lineWidth = 1.4; streamPath(bx, 23, ph+4.2);
     /* falling sparks on the stream */
     for (var k=0;k<5;k++){
       var vv = (((now*(0.05+k*0.017) + k*H*0.37 + bi*90) % (H+40)) - 20) / H;
@@ -425,11 +435,12 @@ function frame(now){
     n.fl = Math.max(0, n.fl - 0.012);
     var tw = 0.55 + 0.45*Math.sin(now*0.002 + n.tw);
     var r = 2 + n.fl*5 + tw*0.7;
-    var g3 = ctx.createRadialGradient(PX(n.x,n.y), PY(n.y), 0, PX(n.x,n.y), PY(n.y), r*3.2);
-    g3.addColorStop(0,'rgba(255,255,255,'+(0.75+n.fl*0.25)+')');
-    g3.addColorStop(0.3, rgba(colCur, 0.5*tw + n.fl*0.4));
+    var depthK = 0.65 + 0.55*n.y, depthA = 0.72 + 0.38*n.y;
+    var g3 = ctx.createRadialGradient(PX(n.x,n.y), PY(n.y), 0, PX(n.x,n.y), PY(n.y), r*3.2*depthK);
+    g3.addColorStop(0,'rgba(255,255,255,'+((0.75+n.fl*0.25)*depthA)+')');
+    g3.addColorStop(0.3, rgba(colCur, (0.5*tw + n.fl*0.4)*depthA));
     g3.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle = g3; ctx.beginPath(); ctx.arc(PX(n.x,n.y), PY(n.y), r*3.2, 0, 6.283); ctx.fill();
+    ctx.fillStyle = g3; ctx.beginPath(); ctx.arc(PX(n.x,n.y), PY(n.y), r*3.2*depthK, 0, 6.283); ctx.fill();
   });
 
   /* decision path tracing */
@@ -519,6 +530,9 @@ setInterval(function(){
     pill2.style.background = hold ? '#8c1d2f' : '#1d7a38';
     pill2.style.color = hold ? '#ffd7dd' : '#cbffd9';
     document.getElementById('stConf').style.color = hold ? '#ff5d73' : '';
+    var cf3 = document.getElementById('confFill');
+    cf3.style.width = (cv2*100)+'%';
+    cf3.style.background = hold ? '#ff5d73' : '#3dff7a';
   }
 }, 700);
 
