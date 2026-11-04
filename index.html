@@ -69,7 +69,7 @@
   .node.nl{transform:translate(-2%,-50%)}
   .node.nr{transform:translate(-90%,-50%)}
   .node em{display:none;font-style:normal}
-  .node.hot{opacity:1;border:2px solid var(--case);border-radius:3px;background:linear-gradient(180deg,var(--case-dim),rgba(0,0,0,.30));box-shadow:0 0 55px var(--case-dim),0 0 18px var(--case-dim),inset 0 0 18px rgba(0,0,0,.35);padding:11px 15px;font-size:13.5px;z-index:6;text-shadow:0 0 8px rgba(0,0,0,.9),0 1px 4px #000;transition:border-color .8s,box-shadow .8s}
+  .node.hot{opacity:1;border:2px solid var(--case);border-radius:3px;background:linear-gradient(180deg,var(--case-dim),rgba(0,0,0,.30));box-shadow:0 0 55px var(--case-dim),0 0 18px var(--case-dim),inset 0 0 18px rgba(0,0,0,.35);padding:13px 18px;font-size:15px;z-index:6;text-shadow:0 0 8px rgba(0,0,0,.9),0 1px 4px #000;transition:border-color .8s,box-shadow .8s}
   #lens{position:absolute;width:190px;height:190px;border:2px solid var(--case);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:4;opacity:.85;box-shadow:0 0 34px var(--case-dim),inset 0 0 34px rgba(0,0,0,.35);transition:left 1.4s ease,top 1.4s ease,border-color .8s;animation:lensPulse 3.2s ease-in-out infinite}
   @keyframes lensPulse{0%,100%{scale:1;opacity:.7}50%{scale:1.07;opacity:.95}}
   .node.hot small{color:#ffb3ba}
@@ -264,7 +264,7 @@ COLS.forEach(function(col, ci){
   stage.appendChild(hd); headers.push({el:hd, ci:ci});
   col.nodes.forEach(function(nd, ni){
     var x = colX[ci] + Math.sin(ni*2.7+ci)*0.02 + Math.cos(ni*5.1+ci*2)*0.008;
-    var y = 0.14 + ni*0.12 + Math.sin(ni*1.9+ci*3)*0.022;
+    var y = 0.175 + ni*0.112 + Math.sin(ni*1.9+ci*3)*0.02;
     var el = document.createElement('div');
     el.className = 'node mono' + (ci===0?' nl':(ci===4?' nr':'')); el.style.left = (projFX(x,y)*100)+'%'; el.style.top = (projFY(y)*100)+'%';
     el.style.fontSize = (9.6 + ((ni*7+ci*3)%4)*0.7) + 'px';
@@ -293,7 +293,7 @@ for (var s=0; s<130; s++) stars.push({x:Math.random(), y:Math.random(), r:Math.r
 /* ghost micro-labels — canvas-drawn filler so the field feels dense and organic like the reel */
 var GHOSTWORDS = ["queue check","title len","thumb ok","api ping","log write","spam scan","hold gate","map read","token ok","reply draft","score head","state enc","gate pass","file hash","views chk","dm state","post id","rank in","cost chk","time ist","round no","part no","link out","note save"];
 var ghosts = [];
-for (var gi=0; gi<105; gi++) ghosts.push({x:0.03+Math.random()*0.94, y:0.05+Math.random()*0.9, w:GHOSTWORDS[gi%GHOSTWORDS.length], a:0.22+Math.random()*0.3, ph:Math.random()*6.28});
+for (var gi=0; gi<105; gi++) ghosts.push({x:0.03+Math.random()*0.94, y:0.09+Math.random()*0.86, w:GHOSTWORDS[gi%GHOSTWORDS.length], a:0.22+Math.random()*0.3, ph:Math.random()*6.28});
 
 /* ============ CANVAS ============ */
 var cv = document.getElementById('web'), ctx = cv.getContext('2d');
