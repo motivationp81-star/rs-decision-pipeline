@@ -55,22 +55,23 @@
 
   /* ===== STAGE ===== */
   #stageWrap{position:relative;height:560px;margin-top:2px;overflow:hidden;border-top:1px solid rgba(120,180,255,.10);border-bottom:1px solid rgba(120,180,255,.10)}
-  #cam{position:absolute;inset:-30px -40px;will-change:transform}
+  #cam{position:absolute;left:0;top:0;will-change:transform;transform-origin:0 0}
   #web{position:absolute;inset:0;width:100%;height:100%}
   .colhead{position:absolute;top:8px;transform:translateX(-50%);font-size:9.5px;letter-spacing:.12em;color:#9fb8dd;white-space:nowrap;z-index:5;text-shadow:0 1px 6px #000;background:rgba(1,1,3,.78);padding:2px 5px;border-radius:2px}
   .colhead.nl{transform:translateX(0)}
   .colhead.nr{transform:translateX(-100%)}
   .colhead b{color:var(--case);font-weight:800;transition:color .8s}
-  .node{transition:border-color .18s,box-shadow .18s,background .18s;position:absolute;transform:translate(-50%,-50%);font-size:13.5px;letter-spacing:.03em;color:#dceaff;white-space:nowrap;text-shadow:0 1px 6px #000;z-index:3;opacity:.95;width:176px;height:50px;padding:8px 11px;background:rgba(5,7,14,.82);border:1px solid var(--case-dim);border-radius:5px;overflow:hidden;box-sizing:border-box;text-overflow:ellipsis}
+  .node{transition:border-color .18s,box-shadow .18s,background .18s;position:absolute;transform:translate(-50%,-50%);font-size:23px;letter-spacing:.03em;color:#dceaff;white-space:nowrap;text-shadow:0 1px 6px #000;z-index:3;opacity:.95;width:300px;height:84px;padding:14px 18px;background:rgba(5,7,14,.55);border:1px solid var(--case-dim);border-radius:8px;overflow:hidden;box-sizing:border-box;text-overflow:ellipsis}
   .node::after{content:"";position:absolute;left:11px;bottom:3px;width:16px;height:2px;background:transparent}
   #chips .node:nth-child(3n)::after{background:rgba(255,61,139,.55);box-shadow:0 0 6px rgba(255,61,139,.5)}
   .node::before{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;background:#fff;box-shadow:0 0 8px #fff,0 0 14px var(--nc,#fff);margin-right:6px;vertical-align:2px}
-  .node small{display:block;font-size:9.5px;color:var(--mut);margin-left:13px;letter-spacing:.05em;margin-top:3px}
-  .node.nl{transform:translate(-2%,-50%)}
-  .node.nr{transform:translate(-90%,-50%)}
+  .node small{display:block;font-size:15px;color:var(--mut);margin-left:21px;letter-spacing:.05em;margin-top:5px}
+  .node.nl{transform:translate(-50%,-50%)}
+  .node.nr{transform:translate(-50%,-50%)}
   .node em{display:none;font-style:normal}
-  .node.hot{opacity:1;width:176px;height:50px;border:1.6px solid var(--case);background:color-mix(in srgb,var(--case) 30%,rgba(5,7,14,.85));box-shadow:0 0 9px var(--case-dim);z-index:6}
-  #lens{display:none;position:absolute;width:170px;height:170px;border:2px solid var(--case);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:4;opacity:.38;box-shadow:0 0 16px var(--case-dim),inset 0 0 16px rgba(0,0,0,.35);transition:left 1.4s ease,top 1.4s ease,border-color .8s;animation:lensPulse 3.2s ease-in-out infinite}
+  .node.hot{opacity:1;width:300px;height:84px;border:1.6px solid var(--case);background:color-mix(in srgb,var(--case) 22%,rgba(5,7,14,.7));box-shadow:0 0 9px var(--case-dim);z-index:6}
+  #lens{position:absolute;border:2px solid var(--case);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:4;opacity:.5;box-shadow:0 0 22px var(--case-dim),inset 0 0 22px rgba(0,0,0,.3)}
+  #activeBox{position:absolute;border:2.5px solid var(--case);border-radius:14px;background:color-mix(in srgb,var(--case) 13%,transparent);box-shadow:0 0 34px var(--case-dim),0 0 12px var(--case-dim),inset 0 0 18px rgba(0,0,0,.35);z-index:2;pointer-events:none}
   @keyframes lensPulse{0%,100%{scale:1;opacity:.30}50%{scale:1.05;opacity:.45}}
   .node.hit{border-color:rgba(255,255,255,.75)}
   .node.hot small{color:#ffb3ba}
@@ -104,7 +105,8 @@
   footer b{color:#eaf4ff}
   .demo{color:var(--gold);letter-spacing:.18em}
   @media (max-width:1100px){ .strip{grid-template-columns:1fr 1fr} #stageWrap{height:480px} .casename{font-size:32px} }
-  @media (max-width:640px){ .strip{grid-template-columns:1fr} .stat .val{font-size:24px} #stageWrap{height:430px} .node{font-size:9px} }
+  @media (max-width:1100px){ .node{width:220px;height:64px;font-size:17px;padding:10px 13px} .node small{font-size:12px;margin-left:16px} }
+  @media (max-width:640px){ .strip{grid-template-columns:1fr} .stat .val{font-size:24px} #stageWrap{height:430px} .node{width:150px;height:46px;font-size:12px;padding:7px 9px} .node small{font-size:8.5px;margin-left:12px;margin-top:2px} }
 </style>
 </head>
 <body>
@@ -144,6 +146,7 @@
     <div id="cam">
       <canvas id="web"></canvas>
       <div id="chips"></div>
+      <div id="activeBox"></div>
       <div id="lens"></div>
     </div>
     <div id="wash"></div>
@@ -254,21 +257,21 @@ var LOGPOOL = [
 var chipsEl = document.getElementById('chips');
 var stage = document.getElementById('stageWrap');
 var nodes = [], edges = [], headers = [];
-var colX = [0.115, 0.3075, 0.50, 0.6925, 0.885];
+var colX = [0.09, 0.27, 0.45, 0.63, 0.81];
 /* fake-3D projection: top of the plane compressed (far), bottom full width (near) — works in every renderer */
-function projFX(x, y){ return 0.5 + (x - 0.5) * (0.86 + 0.14 * y); }
-function projFY(y){ return 0.06 + 0.94 * Math.pow(y, 1.10); }
+function projFX(x, y){ return x; }
+function projFY(y){ return y; }
 COLS.forEach(function(col, ci){
   var hd = document.createElement('div');
   hd.className = 'colhead mono' + (ci===0?' nl':(ci===4?' nr':'')); hd.style.left = (colX[ci]*100)+'%';
   hd.innerHTML = col.h.replace(/^(\d+ · )/, '<b>$1</b>');
-  stage.appendChild(hd); headers.push({el:hd, ci:ci});
+  chipsEl.appendChild(hd); hd.style.top = '1.6%'; headers.push({el:hd, ci:ci});
   col.nodes.forEach(function(nd, ni){
     var x = colX[ci];
-    var y = 0.135 + ni*0.094;
+    var y = 0.08 + ni*0.108;
     var el = document.createElement('div');
     el.className = 'node mono' + (ci===0?' nl':(ci===4?' nr':'')); el.style.left = (projFX(x,y)*100)+'%'; el.style.top = (projFY(y)*100)+'%';
-    el.style.fontSize = '13.5px';
+
     el.style.setProperty('--nc', CASES[0].color);
     el.innerHTML = nd[0] + (nd[1] ? '<small>'+nd[1]+'</small>' : '') + '<em>'+DETAILS[ci][ni]+'</em>';
     chipsEl.appendChild(el);
@@ -297,8 +300,10 @@ for (var gi=0; gi<105; gi++) ghosts.push({x:0.03+Math.random()*0.94, y:0.09+Math
 /* ============ CANVAS ============ */
 var cv = document.getElementById('web'), ctx = cv.getContext('2d');
 var W=0, H=0;
-function fit(){ var r = stage.getBoundingClientRect(); W = cv.width = r.width+80; H = cv.height = r.height+60;
-  headers.forEach(function(hd){ hd.el.style.left = (-40 + projFX(colX[hd.ci], 0)*(r.width+80)) + 'px'; });
+var stageW = 0, stageH = 0, camEl = document.getElementById('cam');
+function fit(){ var r = stage.getBoundingClientRect(); stageW = r.width; stageH = r.height;
+  W = cv.width = Math.round(r.width*2); H = cv.height = Math.round(r.height*2.1);
+  camEl.style.width = W+'px'; camEl.style.height = H+'px';
 }
 fit(); window.addEventListener('resize', fit);
 
@@ -313,14 +318,16 @@ var chains = [], chainTimer = 15;
 function hitFlash(n){ /* boxes stay still now — only the travelling line animates */ }
 function spawnChain(){
   var col = (Math.random()*5)|0;
-  chains.push({col:col, row:0, tc:col, t:0, sp:0.030+Math.random()*0.012});
+  chains.push({col:col, row:(Math.random()*3)|0, tc:col, t:0, sp:0.016+Math.random()*0.007});
   hitFlash(nodes[col*NROW]);
 }
 var curCase = 0, caseClock = 0;
+var abX = 0, abY = 0;
 var colCur = [255,42,60], colTgt = [255,42,60];
 function hexRgb(h){ return [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)]; }
 function rgba(c,a){ return 'rgba('+(c[0]|0)+','+(c[1]|0)+','+(c[2]|0)+','+a+')'; }
 var camX=0.16, camY=0.40, camTX=0.16, camTY=0.40, t0=performance.now();
+var camScale = 0.62, scaleTgt = 0.62, focusNode = null;
 var zoomCur=1.07, zoomTgt=1.07;
 var orbs = [];
 for (var ob=0; ob<5; ob++) orbs.push({s:ob%7, y:Math.random(), sp:0.008+Math.random()*0.014, r:15+Math.random()*15, ph:Math.random()*6.28});
@@ -341,9 +348,14 @@ function frame(now){
   var dt = Math.min(50, now - t0); t0 = now;
   /* colour morph */
   for (var i=0;i<3;i++) colCur[i] += (colTgt[i]-colCur[i])*0.045;
-  /* camera frozen: boxes never move or resize — only lines animate */
-  var cam = document.getElementById('cam');
-  cam.style.transform = 'scale(1.03)';
+  /* camera glides INSIDE the big plane, following the travelling decision */
+  var fx = focusNode ? focusNode.x : camTX, fy = focusNode ? focusNode.y : camTY;
+  camScale += (scaleTgt - camScale) * 0.02;
+  var tx = stageW/2 - fx*W*camScale + Math.sin(now*0.00016)*7;
+  var ty = stageH/2 - fy*H*camScale + Math.cos(now*0.00013)*6;
+  tx = Math.max(stageW - W*camScale, Math.min(0, tx));
+  ty = Math.max(stageH - H*camScale, Math.min(0, ty));
+  camEl.style.transform = 'translate('+tx+'px,'+ty+'px) scale('+camScale+')';
 
   ctx.clearRect(0,0,W,H);
   ctx.globalCompositeOperation = 'lighter';
@@ -361,13 +373,13 @@ function frame(now){
   });
 
   /* ghost micro-labels — dense filler under the web */
-  ctx.font = '7px ui-monospace, Menlo, monospace';
+  ctx.font = '13px ui-monospace, Menlo, monospace';
   ghosts.forEach(function(gh){
     var ga = gh.a * (0.7 + 0.3*Math.sin(now*0.001 + gh.ph));
     ctx.fillStyle = 'rgba(255,255,255,'+(ga+0.25)+')';
-    ctx.beginPath(); ctx.arc(PX(gh.x,gh.y), PY(gh.y), 1.1, 0, 6.283); ctx.fill();
+    ctx.beginPath(); ctx.arc(PX(gh.x,gh.y), PY(gh.y), 2, 0, 6.283); ctx.fill();
     ctx.fillStyle = 'rgba(178,205,245,'+ga+')';
-    ctx.fillText(gh.w, PX(gh.x,gh.y) + 5, PY(gh.y) + 2);
+    ctx.fillText(gh.w, PX(gh.x,gh.y) + 9, PY(gh.y) + 4);
   });
 
   /* web edges — two passes: wide glow underlay + bright core */
@@ -376,30 +388,30 @@ function frame(now){
     var ax=PX(A.x,A.y), ay=PY(A.y), bx=PX(B.x,B.y), by=PY(B.y);
     var mx=(ax+bx)/2 + Math.sin(e.ph)*9, my=(ay+by)/2 + Math.cos(e.ph*1.3)*7;
     var shimmer = 0.30 + 0.10*Math.sin(now*0.0011 + e.ph) + (idx%7===0?0.12:0);
-    ctx.strokeStyle = rgba(colCur, shimmer*0.18); ctx.lineWidth = 2.2;
+    ctx.strokeStyle = rgba(colCur, shimmer*0.18); ctx.lineWidth = 3.4;
     ctx.beginPath(); ctx.moveTo(ax,ay); ctx.quadraticCurveTo(mx,my,bx,by); ctx.stroke();
     var strandCols = ['rgba(255,255,255,', 'rgba(255,61,139,', 'rgba(37,230,255,', 'rgba(255,210,62,'];
-    ctx.strokeStyle = (idx%3===0) ? strandCols[idx%4]+(shimmer*0.8)+')' : rgba(colCur, shimmer*0.9); ctx.lineWidth = 0.8;
+    ctx.strokeStyle = (idx%3===0) ? strandCols[idx%4]+(shimmer*0.8)+')' : rgba(colCur, shimmer*0.9); ctx.lineWidth = 1.3;
     ctx.beginPath(); ctx.moveTo(ax,ay); ctx.quadraticCurveTo(mx,my,bx,by); ctx.stroke();
     if (A.x === B.x && B.y > A.y){
-      ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.lineWidth = 1.6;
-      ctx.setLineDash([4, 8]); ctx.lineDashOffset = -(now*0.045 + idx*5);
+      ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 2.4;
+      ctx.setLineDash([7, 12]); ctx.lineDashOffset = -(now*0.045 + idx*5);
       ctx.beginPath(); ctx.moveTo(ax,ay); ctx.quadraticCurveTo(mx,my,bx,by); ctx.stroke();
       ctx.setLineDash([]);
     }
   });
 
   /* vertical energy streams between columns */
-  var bounds = [0.19, 0.295, 0.40, 0.505, 0.61, 0.715, 0.82];
+  var bounds = [0.18, 0.36, 0.54, 0.72];
   bounds.forEach(function(bx, bi){
     var ph = now*0.0016 + bi*1.7, sa = (bi%2===0) ? 1 : 0.68;
-    ctx.strokeStyle = rgba(colCur, 0.020*sa+0.008); ctx.lineWidth = 10; streamPath(bx, 11, ph);
-    ctx.strokeStyle = rgba(colCur, 0.045*sa+0.012); ctx.lineWidth = 5; streamPath(bx, 10, ph);
-    ctx.strokeStyle = rgba(colCur, 0.12*sa+0.03); ctx.lineWidth = 2;  streamPath(bx, 8, ph);
-    ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = 0.9; streamPath(bx, 7, ph);
+    ctx.strokeStyle = rgba(colCur, 0.05*sa+0.015); ctx.lineWidth = 30; streamPath(bx, 20, ph);
+    ctx.strokeStyle = rgba(colCur, 0.09*sa+0.02); ctx.lineWidth = 15; streamPath(bx, 18, ph);
+    ctx.strokeStyle = rgba(colCur, 0.22*sa+0.04); ctx.lineWidth = 5;  streamPath(bx, 15, ph);
+    ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 2.2; streamPath(bx, 13, ph);
     /* braided companion strands winding around the core */
-    ctx.strokeStyle = rgba(colCur, 0.11*sa+0.02); ctx.lineWidth = 1.0; streamPath(bx, 14, ph+2.1);
-    ctx.strokeStyle = rgba(colCur, 0.09*sa+0.02); ctx.lineWidth = 0.9; streamPath(bx, 14, ph+4.2);
+    ctx.strokeStyle = rgba(colCur, 0.13*sa+0.02); ctx.lineWidth = 1.8; streamPath(bx, 26, ph+2.1);
+    ctx.strokeStyle = rgba(colCur, 0.11*sa+0.02); ctx.lineWidth = 1.6; streamPath(bx, 26, ph+4.2);
     /* falling sparks on the stream */
     for (var k=0;k<5;k++){
       var vv = (((now*(0.05+k*0.017) + k*H*0.37 + bi*90) % (H+40)) - 20) / H;
@@ -422,62 +434,69 @@ function frame(now){
     var mx=(ax+bx)/2 + Math.sin(pu.e.ph)*9, my=(ay+by)/2 + Math.cos(pu.e.ph*1.3)*7;
     var u = pu.t, iu = 1-u;
     var x = iu*iu*ax + 2*iu*u*mx + u*u*bx, y = iu*iu*ay + 2*iu*u*my + u*u*by;
-    var g2 = ctx.createRadialGradient(x,y,0,x,y,6+pu.sz*2);
+    var g2 = ctx.createRadialGradient(x,y,0,x,y,11+pu.sz*3.5);
     g2.addColorStop(0,'rgba(255,255,255,0.8)'); g2.addColorStop(0.35, rgba(colCur,0.5)); g2.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle = g2; ctx.beginPath(); ctx.arc(x,y,6+pu.sz*2,0,6.283); ctx.fill();
+    ctx.fillStyle = g2; ctx.beginPath(); ctx.arc(x,y,11+pu.sz*3.5,0,6.283); ctx.fill();
   });
 
-  /* chains: signal travels box-to-box; on arrival the next box lights up and fires it onward */
-  chainTimer -= dt/16.7;
-  if (chainTimer<=0 && chains.length<6){ spawnChain(); chainTimer = 24+Math.random()*26; }
-  chains = chains.filter(function(ch){ return ch.row < NROW-1; });
+  /* runners: a bright light runs from box to box down the plane — the reel's core motion */
   chains.forEach(function(ch){
     var A = nodes[ch.col*NROW + ch.row], B = nodes[ch.tc*NROW + ch.row + 1];
     if (!A || !B){ ch.row = NROW; return; }
     ch.t += ch.sp * (dt/16.7);
     if (ch.t>=1){
-      hitFlash(B);
+      focusNode = B;
       ch.col = ch.tc; ch.row += 1; ch.t = 0; ch.tc = ch.col;
-      if (ch.row < NROW-1 && Math.random()<0.30){
+      if (ch.row < NROW-1 && Math.random()<0.35){
         var nc = ch.col + (Math.random()<0.5 ? -1 : 1);
         if (nc>=0 && nc<5) ch.tc = nc;
       }
       return;
     }
-    var ax=PX(A.x,A.y), ay=PY(A.y)+28, bx=PX(B.x,B.y), by=PY(B.y)-28;
-    var mx=(ax+bx)/2 + (ch.tc!==ch.col ? (bx-ax)*0.10 : 7), my=(ay+by)/2;
+    var ax=PX(A.x,A.y), ay=PY(A.y)+H*0.036, bx=PX(B.x,B.y), by=PY(B.y)-H*0.036;
+    var mx=(ax+bx)/2 + (ch.tc!==ch.col ? (bx-ax)*0.10 : 12), my=(ay+by)/2;
     function cpos(u){ var iu=1-u; return [iu*iu*ax + 2*iu*u*mx + u*u*bx, iu*iu*ay + 2*iu*u*my + u*u*by]; }
-    /* exit port: a bright dot ON the source box's bottom edge, where the line leaves the box */
     ctx.fillStyle = '#ffffff';
-    ctx.beginPath(); ctx.arc(ax, ay-3, 3, 0, 6.283); ctx.fill();
-    ctx.strokeStyle = rgba(colCur, 0.9); ctx.lineWidth = 1.6;
-    ctx.beginPath(); ctx.arc(ax, ay-3, 6, 0, 6.283); ctx.stroke();
-    var head = cpos(ch.t), tail = cpos(Math.max(0, ch.t-0.38));
+    ctx.beginPath(); ctx.arc(ax, ay-4, 5, 0, 6.283); ctx.fill();
+    ctx.strokeStyle = rgba(colCur, 0.9); ctx.lineWidth = 2.4;
+    ctx.beginPath(); ctx.arc(ax, ay-4, 9, 0, 6.283); ctx.stroke();
+    var head = cpos(ch.t), tail = cpos(Math.max(0, ch.t-0.42));
     ctx.lineCap = 'round';
-    ctx.strokeStyle = rgba(colCur, 0.65); ctx.lineWidth = 8;
+    ctx.strokeStyle = rgba(colCur, 0.6); ctx.lineWidth = 13;
     ctx.beginPath(); ctx.moveTo(tail[0],tail[1]); ctx.lineTo(head[0],head[1]); ctx.stroke();
-    ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.lineWidth = 3;
+    ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.lineWidth = 4.5;
     ctx.beginPath(); ctx.moveTo(tail[0],tail[1]); ctx.lineTo(head[0],head[1]); ctx.stroke();
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath(); ctx.arc(head[0], head[1], 3.4, 0, 6.283); ctx.fill();
-    ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = 1.4;
-    ctx.beginPath(); ctx.arc(head[0], head[1], 6.5, 0, 6.283); ctx.stroke();
-    /* entry port on the target box's top edge */
+    var hg = ctx.createRadialGradient(head[0],head[1],0,head[0],head[1],26);
+    hg.addColorStop(0,'rgba(255,255,255,0.95)'); hg.addColorStop(0.35, rgba(colCur,0.55)); hg.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle = hg; ctx.beginPath(); ctx.arc(head[0],head[1],26,0,6.283); ctx.fill();
     ctx.fillStyle = 'rgba(255,255,255,0.9)';
-    ctx.beginPath(); ctx.arc(bx, by+3, 2.4, 0, 6.283); ctx.fill();
-    ctx.lineCap = 'butt';
+    ctx.beginPath(); ctx.arc(bx, by+4, 4, 0, 6.283); ctx.fill();
   });
+
+  /* the big glowing outline + lens glide to the active box (DOM, inside the plane) */
+  if (focusNode){
+    abX += (PX(focusNode.x, focusNode.y) - abX) * 0.07;
+    abY += (PY(focusNode.y) - abY) * 0.07;
+    var ab = document.getElementById('activeBox');
+    var abW = W*0.20, abH = H*0.155;
+    ab.style.left = (abX-abW/2)+'px'; ab.style.top = (abY-abH/2)+'px';
+    ab.style.width = abW+'px'; ab.style.height = abH+'px';
+    var ln = document.getElementById('lens');
+    var ls = abH*1.5;
+    ln.style.width = ls+'px'; ln.style.height = ls+'px';
+    ln.style.left = (abX + abW*0.44)+'px'; ln.style.top = (abY - abH*0.12)+'px';
+  }
 
   /* nodes glow + random flares */
   nodes.forEach(function(n){
     var tw = 0.55 + 0.45*Math.sin(now*0.002 + n.tw);
     var r = 2 + tw*0.7;
     var depthK = 0.65 + 0.55*n.y, depthA = 0.72 + 0.38*n.y;
-    var g3 = ctx.createRadialGradient(PX(n.x,n.y), PY(n.y), 0, PX(n.x,n.y), PY(n.y), r*2.3*depthK);
+    var g3 = ctx.createRadialGradient(PX(n.x,n.y), PY(n.y), 0, PX(n.x,n.y), PY(n.y), r*4.2*depthK);
     g3.addColorStop(0,'rgba(255,255,255,'+(0.5*depthA)+')');
     g3.addColorStop(0.3, rgba(colCur, (0.3*tw)*depthA));
     g3.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle = g3; ctx.beginPath(); ctx.arc(PX(n.x,n.y), PY(n.y), r*2.3*depthK, 0, 6.283); ctx.fill();
+    ctx.fillStyle = g3; ctx.beginPath(); ctx.arc(PX(n.x,n.y), PY(n.y), r*4.2*depthK, 0, 6.283); ctx.fill();
   });
 
   /* decision path tracing */
@@ -541,7 +560,7 @@ function setCase(i){
   var hot3 = nodes[(i*3 + 24) % nodes.length]; if (hot3) hot3.el.classList.add('hot');
   var lens = document.getElementById('lens');
   if (lens && hot2){ lens.style.left = (projFX(hot2.x,hot2.y)*100)+'%'; lens.style.top = (projFY(hot2.y)*100)+'%'; lens.style.borderColor = cs.color; }
-  zoomTgt = cs.zoom;
+  scaleTgt = 0.60 + (i%3)*0.035; focusNode = nodes[(i*7+10) % nodes.length];
   Array.prototype.forEach.call(ucWrap.children, function(el, j){ el.classList.toggle('on', j===i); });
   traceTimer = 30;
 }
@@ -637,4 +656,4 @@ setInterval(function(){
 </body>
 </html>
 
-<!-- build fit-names -->
+<!-- build plane-rebuild -->
