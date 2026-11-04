@@ -69,7 +69,7 @@
   .node.nl{transform:translate(-2%,-50%)}
   .node.nr{transform:translate(-90%,-50%)}
   .node em{display:none;font-style:normal}
-  .node.hot{opacity:1;width:168px;height:auto;border:2px solid var(--case);border-radius:3px;background:linear-gradient(180deg,var(--case-dim),rgba(0,0,0,.30));box-shadow:0 0 55px var(--case-dim),0 0 18px var(--case-dim),inset 0 0 18px rgba(0,0,0,.35);padding:13px 18px;font-size:15px;z-index:6;text-shadow:0 0 8px rgba(0,0,0,.9),0 1px 4px #000;transition:border-color .8s,box-shadow .8s}
+  .node.hot{opacity:1;width:230px;height:auto;border:2px solid var(--case);border-radius:6px;background:linear-gradient(180deg,color-mix(in srgb,var(--case) 55%,transparent),color-mix(in srgb,var(--case) 16%,transparent));box-shadow:0 0 75px var(--case-dim),0 0 22px var(--case-dim),inset 0 0 18px rgba(0,0,0,.35);padding:16px 22px;font-size:17px;z-index:6;text-shadow:0 0 8px rgba(0,0,0,.9),0 1px 4px #000;transition:border-color .8s,box-shadow .8s}
   #lens{position:absolute;width:190px;height:190px;border:2px solid var(--case);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:4;opacity:.85;box-shadow:0 0 34px var(--case-dim),inset 0 0 34px rgba(0,0,0,.35);transition:left 1.4s ease,top 1.4s ease,border-color .8s;animation:lensPulse 3.2s ease-in-out infinite}
   @keyframes lensPulse{0%,100%{scale:1;opacity:.7}50%{scale:1.07;opacity:.95}}
   .node.hot small{color:#ffb3ba}
@@ -225,12 +225,12 @@ var COLS = [
     ["log · written","state + queue"],["report · to Vikram","link ke saath"],["alert · raised","gadbad par"],["summary · saved",""]]}
 ];
 var CASES = [
-  {name:"Daily Upload Round", sub:'Choice · <b>which part, which channel</b> · gate ≥ rules', color:"#ff2a3c", cam:[0.16,0.40], zoom:1.07},
-  {name:"Instagram Reply",    sub:'Choice · <b>reply as manager</b> · spam → hold',          color:"#3dff7a", cam:[0.34,0.58], zoom:1.18},
-  {name:"New Part Intake",    sub:'Check · <b>title ≤ 100 · file · thumbnail</b>',           color:"#ffd23e", cam:[0.52,0.36], zoom:1.12},
-  {name:"Business Inquiry",   sub:'Gate · <b>no deal without Vikram</b> · draft only',       color:"#ff3d8b", cam:[0.68,0.60], zoom:1.18},
-  {name:"GitHub Upkeep",      sub:'Check · <b>metrics · snake · 3D city</b> · weekly',       color:"#25e6ff", cam:[0.84,0.42], zoom:1.16},
-  {name:"Channel Guard",      sub:'Rule · <b>one channel stops, never all</b>',              color:"#b26bff", cam:[0.50,0.72], zoom:1.20}
+  {name:"Daily Upload Round", sub:'Choice · <b>which part, which channel</b> · gate ≥ rules', color:"#ff2a3c", cam:[0.16,0.40], zoom:1.11},
+  {name:"Instagram Reply",    sub:'Choice · <b>reply as manager</b> · spam → hold',          color:"#3dff7a", cam:[0.34,0.58], zoom:1.22},
+  {name:"New Part Intake",    sub:'Check · <b>title ≤ 100 · file · thumbnail</b>',           color:"#ffd23e", cam:[0.52,0.36], zoom:1.24},
+  {name:"Business Inquiry",   sub:'Gate · <b>no deal without Vikram</b> · draft only',       color:"#ff3d8b", cam:[0.68,0.60], zoom:1.22},
+  {name:"GitHub Upkeep",      sub:'Check · <b>metrics · snake · 3D city</b> · weekly',       color:"#25e6ff", cam:[0.84,0.42], zoom:1.24},
+  {name:"Channel Guard",      sub:'Rule · <b>one channel stops, never all</b>',              color:"#b26bff", cam:[0.50,0.72], zoom:1.24}
 ];
 var DETAILS = [
   ["ist · 9 channels","as manager · english","pending · no spam","drive · original file","price kabhi final nahi","production tokens","seedha Vikram ko"],
@@ -373,7 +373,7 @@ function frame(now){
     var shimmer = 0.30 + 0.10*Math.sin(now*0.0011 + e.ph) + (idx%7===0?0.12:0);
     ctx.strokeStyle = rgba(colCur, shimmer*0.30); ctx.lineWidth = 3.2;
     ctx.beginPath(); ctx.moveTo(ax,ay); ctx.quadraticCurveTo(mx,my,bx,by); ctx.stroke();
-    ctx.strokeStyle = (idx%9===4) ? 'rgba(255,61,139,'+(shimmer*0.85)+')' : rgba(colCur, shimmer); ctx.lineWidth = 1.2;
+    ctx.strokeStyle = (idx%9===4) ? 'rgba(255,61,139,'+(shimmer*0.85)+')' : (idx%7===3 ? 'rgba(96,165,255,'+(shimmer*0.85)+')' : rgba(colCur, shimmer)); ctx.lineWidth = 1.2;
     ctx.beginPath(); ctx.moveTo(ax,ay); ctx.quadraticCurveTo(mx,my,bx,by); ctx.stroke();
   });
 
