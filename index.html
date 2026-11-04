@@ -37,7 +37,7 @@
   .confgauge{position:relative;height:4px;background:rgba(130,160,210,.18);margin:6px 0 3px;width:158px}
   .confgauge i{position:absolute;left:0;top:0;bottom:0;background:var(--green);width:94%;transition:width .5s,background .5s}
   .confgauge em{position:absolute;left:85%;top:-3px;width:2px;height:10px;background:#fff;opacity:.75}
-  #wash{position:absolute;inset:0;pointer-events:none;background:radial-gradient(62% 58% at 50% 44%,var(--case-dim),transparent 72%);opacity:.17;mix-blend-mode:screen;z-index:2;transition:background .8s}
+  #wash{position:absolute;inset:0;pointer-events:none;background:radial-gradient(62% 58% at 50% 44%,var(--case-dim),transparent 72%);opacity:.08;mix-blend-mode:screen;z-index:2;transition:background .8s}
   .tabs{display:flex;gap:6px;align-items:center;padding-top:8px}
   .tabs span{font-size:9px;letter-spacing:.18em;padding:4px 9px;border:1px solid rgba(140,180,255,.35);border-radius:3px;color:#bcd6ff}
   .tabs span.on{background:var(--case);border-color:var(--case);color:#fff;transition:background .8s}
@@ -61,7 +61,7 @@
   .colhead.nl{transform:translateX(0)}
   .colhead.nr{transform:translateX(-100%)}
   .colhead b{color:var(--case);font-weight:800;transition:color .8s}
-  .node{position:absolute;transform:translate(-50%,-50%);font-size:10.5px;letter-spacing:.03em;color:#dceaff;white-space:nowrap;text-shadow:0 1px 6px #000;z-index:3;opacity:.92;width:132px;height:36px;padding:5px 8px 5px 10px;background:rgba(5,7,14,.80);border:1px solid var(--case-dim);border-radius:3px;overflow:hidden;box-sizing:border-box;text-overflow:ellipsis}
+  .node{transition:border-color .18s,box-shadow .18s,background .18s;position:absolute;transform:translate(-50%,-50%);font-size:10.5px;letter-spacing:.03em;color:#dceaff;white-space:nowrap;text-shadow:0 1px 6px #000;z-index:3;opacity:.92;width:132px;height:36px;padding:5px 8px 5px 10px;background:rgba(5,7,14,.80);border:1px solid var(--case-dim);border-radius:3px;overflow:hidden;box-sizing:border-box;text-overflow:ellipsis}
   .node::after{content:"";position:absolute;left:11px;bottom:3px;width:16px;height:2px;background:transparent}
   #chips .node:nth-child(3n)::after{background:rgba(255,61,139,.55);box-shadow:0 0 6px rgba(255,61,139,.5)}
   .node::before{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;background:#fff;box-shadow:0 0 8px #fff,0 0 14px var(--nc,#fff);margin-right:6px;vertical-align:2px}
@@ -70,8 +70,9 @@
   .node.nr{transform:translate(-90%,-50%)}
   .node em{display:none;font-style:normal}
   .node.hot{opacity:1;width:230px;height:auto;border:2px solid var(--case);border-radius:6px;background:linear-gradient(180deg,color-mix(in srgb,var(--case) 55%,transparent),color-mix(in srgb,var(--case) 16%,transparent));box-shadow:0 0 75px var(--case-dim),0 0 22px var(--case-dim),inset 0 0 18px rgba(0,0,0,.35);padding:16px 22px;font-size:17px;z-index:6;text-shadow:0 0 8px rgba(0,0,0,.9),0 1px 4px #000;transition:border-color .8s,box-shadow .8s}
-  #lens{position:absolute;width:190px;height:190px;border:2px solid var(--case);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:4;opacity:.85;box-shadow:0 0 34px var(--case-dim),inset 0 0 34px rgba(0,0,0,.35);transition:left 1.4s ease,top 1.4s ease,border-color .8s;animation:lensPulse 3.2s ease-in-out infinite}
-  @keyframes lensPulse{0%,100%{scale:1;opacity:.7}50%{scale:1.07;opacity:.95}}
+  #lens{position:absolute;width:170px;height:170px;border:2px solid var(--case);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:4;opacity:.38;box-shadow:0 0 16px var(--case-dim),inset 0 0 16px rgba(0,0,0,.35);transition:left 1.4s ease,top 1.4s ease,border-color .8s;animation:lensPulse 3.2s ease-in-out infinite}
+  @keyframes lensPulse{0%,100%{scale:1;opacity:.30}50%{scale:1.05;opacity:.45}}
+  .node.hit{border-color:#ffffff;box-shadow:0 0 24px var(--case),0 0 9px rgba(255,255,255,.85);background:rgba(24,32,54,.96);z-index:5}
   .node.hot small{color:#ffb3ba}
   .node.hot em{display:block;font-size:8.5px;color:#cfe2ff;margin-top:3px;letter-spacing:.04em;line-height:1.5}
 
@@ -210,19 +211,19 @@
 var COLS = [
   {h:"01 · STATE / IN", nodes:[
     ["round clock","06:00 → 00:00"],["new comment","@rsworldwidemusic"],["DM request","pending folder"],
-    ["new video file","Drive link"],["deal inquiry","no price yet"],["token health","9 channels"],["alert · phone",""]]},
+    ["new video file","Drive link"],["deal inquiry","no price yet"],["token health","9 channels"],["alert · phone",""],["quota watch","channel limit"],["views pulse",""]]},
   {h:"02 · TYPED / QUESTIONS", nodes:[
     ["Choice · reply / hold",""],["Nowl · worth_reply",""],["Score · spam_risk",""],
-    ["Score · title_length","≤ 100"],["Choice · channel",""],["Score · gap_rule","≥ 7 others"],["Score · urgency",""]]},
+    ["Score · title_length","≤ 100"],["Choice · channel",""],["Score · gap_rule","≥ 7 others"],["Score · urgency",""],["Score · repeat_gap",""],["Choice · substitute",""]]},
   {h:"03 · RS / SYSTEM ONE", nodes:[
     ["state read","rounds file"],["map lookup","G = next"],["title verify","exact match"],
-    ["duplicate check","API first"],["thumbnail check","as supplied"],["parallel questions",""],["rank head",""]]},
+    ["duplicate check","API first"],["thumbnail check","as supplied"],["parallel questions",""],["rank head",""],["gap simulate","G → 202"],["state write","after verify"]]},
   {h:"04 · GATE / ROUTE", nodes:[
     ["gate ≥ rules",""],["hold · for Vikram","deals only"],["skip · one channel","never all"],
-    ["draft reply","warm · human"],["substitute part","if 12 held"],["route · act",""],["book · nothing",""]]},
+    ["draft reply","warm · human"],["substitute part","if 12 held"],["route · act",""],["book · nothing",""],["route · one channel","only"],["escalate · Vikram",""]]},
   {h:"05 · CODE / ACTS", nodes:[
     ["upload · via API","public"],["reply · sent","as manager"],["file · saved","verbatim"],
-    ["log · written","state + queue"],["report · to Vikram","link ke saath"],["alert · raised","gadbad par"],["summary · saved",""]]}
+    ["log · written","state + queue"],["report · to Vikram","link ke saath"],["alert · raised","gadbad par"],["summary · saved",""],["verify · API read","public?"],["archive · map",""]]}
 ];
 var CASES = [
   {name:"Daily Upload Round", sub:'Choice · <b>which part, which channel</b> · gate ≥ rules', color:"#ff2a3c", cam:[0.16,0.40], zoom:1.11},
@@ -233,11 +234,11 @@ var CASES = [
   {name:"Channel Guard",      sub:'Rule · <b>one channel stops, never all</b>',              color:"#b26bff", cam:[0.50,0.72], zoom:1.24}
 ];
 var DETAILS = [
-  ["ist · 9 channels","as manager · english","pending · no spam","drive · original file","price kabhi final nahi","production tokens","seedha Vikram ko"],
-  ["jawab ya hold","spam hai to ruk","100 ke andar hi","round ka map dekho","kya, kab, kahan","kam se kam 7 aur"],
-  ["purani halat padho","ye round kaun sa","naam bilkul waisa","pehle API jaancho","jo diya wahi lage","teen jawab, ek faisla","sabse upar wala"],
-  ["niyam se bada kuch nahi","deal = Vikram ki marzi","ek ruke, baaki chale","garam, insaani jawab","12 atke to badli","aage badhao","kuch book nahi karna"],
-  ["API se · public","manager bankar","shabd-ba-shabd save","halat + kataar dono","link ke saath report","turant khabar do","aakhri khabar save"]
+  ["ist · 9 channels","as manager · english","pending · no spam","drive · original file","price kabhi final nahi","production tokens","seedha Vikram ko","limit aaye to sirf wahi","har ghante check"],
+  ["jawab ya hold","spam hai to ruk","100 ke andar hi","round ka map dekho","kya, kab, kahan","kam se kam 7 aur","channel pakka pehle","7 aur ke baad hi","atka to badli ready"],
+  ["purani halat padho","ye round kaun sa","naam bilkul waisa","pehle API jaancho","jo diya wahi lage","teen jawab, ek faisla","sabse upar wala","aage ka pura hisaab","galat likha to roko"],
+  ["niyam se bada kuch nahi","deal = Vikram ki marzi","ek ruke, baaki chale","garam, insaani jawab","12 atke to badli","aage badhao","kuch book nahi karna","baaki sab chale","faisla usi ka"],
+  ["API se · public","manager bankar","shabd-ba-shabd save","halat + kataar dono","link ke saath report","turant khabar do","aakhri khabar save","link API par asli hai","map agle round ka"]
 ];
 var UCNAMES = ["upload round","insta reply","part intake","business DM","github check","channel guard","comment reply","dm requests","story post","thumbnail check","shorts plan","report pack"];
 var LOGPOOL = [
@@ -264,7 +265,7 @@ COLS.forEach(function(col, ci){
   stage.appendChild(hd); headers.push({el:hd, ci:ci});
   col.nodes.forEach(function(nd, ni){
     var x = colX[ci];
-    var y = 0.175 + ni*0.112;
+    var y = 0.15 + ni*0.09;
     var el = document.createElement('div');
     el.className = 'node mono' + (ci===0?' nl':(ci===4?' nr':'')); el.style.left = (projFX(x,y)*100)+'%'; el.style.top = (projFY(y)*100)+'%';
     el.style.fontSize = '10.5px';
@@ -276,7 +277,7 @@ COLS.forEach(function(col, ci){
 });
 /* edges: orderly downward flow — vertical chains in each column + diagonals to the row BELOW only */
 function link(a,b){ edges.push({a:a,b:b, ph:Math.random()*6.28}); }
-var NROW = 7;
+var NROW = 9;
 for (var ci=0; ci<5; ci++){
   var base = ci*NROW;
   for (var ni=0; ni<NROW-1; ni++) link(base+ni, base+ni+1);
@@ -302,11 +303,19 @@ function fit(){ var r = stage.getBoundingClientRect(); W = cv.width = r.width+80
 fit(); window.addEventListener('resize', fit);
 
 var pulses = [];
-for (var p=0; p<150; p++){
+for (var p=0; p<55; p++){
   var e = edges[(Math.random()*edges.length)|0];
   pulses.push({e:e, t:Math.random(), sp:0.004+Math.random()*0.011, dir:1, sz:1+Math.random()*1.8});
 }
 var trace = null, traceTimer = 240;
+/* ===== CHAINS: one bright signal runs from box to box down a column — the reel's core motion ===== */
+var chains = [], chainTimer = 15;
+function hitFlash(n){ if (!n || !n.el) return; n.fl = 1; n.el.classList.add('hit'); setTimeout(function(){ n.el.classList.remove('hit'); }, 430); }
+function spawnChain(){
+  var col = (Math.random()*5)|0;
+  chains.push({col:col, row:0, tc:col, t:0, sp:0.021+Math.random()*0.009});
+  hitFlash(nodes[col*NROW]);
+}
 var curCase = 0, caseClock = 0;
 var colCur = [255,42,60], colTgt = [255,42,60];
 function hexRgb(h){ return [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)]; }
@@ -314,7 +323,7 @@ function rgba(c,a){ return 'rgba('+(c[0]|0)+','+(c[1]|0)+','+(c[2]|0)+','+a+')';
 var camX=0.16, camY=0.40, camTX=0.16, camTY=0.40, t0=performance.now();
 var zoomCur=1.07, zoomTgt=1.07;
 var orbs = [];
-for (var ob=0; ob<5; ob++) orbs.push({s:ob%7, y:Math.random(), sp:0.008+Math.random()*0.014, r:26+Math.random()*30, ph:Math.random()*6.28});
+for (var ob=0; ob<5; ob++) orbs.push({s:ob%7, y:Math.random(), sp:0.008+Math.random()*0.014, r:15+Math.random()*15, ph:Math.random()*6.28});
 
 function PX(x, y){ return projFX(x, y) * W; }
 function PY(y){ return projFY(y) * H; }
@@ -371,7 +380,7 @@ function frame(now){
     var ax=PX(A.x,A.y), ay=PY(A.y), bx=PX(B.x,B.y), by=PY(B.y);
     var mx=(ax+bx)/2 + Math.sin(e.ph)*9, my=(ay+by)/2 + Math.cos(e.ph*1.3)*7;
     var shimmer = 0.30 + 0.10*Math.sin(now*0.0011 + e.ph) + (idx%7===0?0.12:0);
-    ctx.strokeStyle = rgba(colCur, shimmer*0.30); ctx.lineWidth = 3.2;
+    ctx.strokeStyle = rgba(colCur, shimmer*0.18); ctx.lineWidth = 2.2;
     ctx.beginPath(); ctx.moveTo(ax,ay); ctx.quadraticCurveTo(mx,my,bx,by); ctx.stroke();
     ctx.strokeStyle = (idx%9===4) ? 'rgba(255,61,139,'+(shimmer*0.85)+')' : (idx%7===3 ? 'rgba(96,165,255,'+(shimmer*0.85)+')' : rgba(colCur, shimmer)); ctx.lineWidth = 1.2;
     ctx.beginPath(); ctx.moveTo(ax,ay); ctx.quadraticCurveTo(mx,my,bx,by); ctx.stroke();
@@ -381,13 +390,13 @@ function frame(now){
   var bounds = [0.19, 0.295, 0.40, 0.505, 0.61, 0.715, 0.82];
   bounds.forEach(function(bx, bi){
     var ph = now*0.0016 + bi*1.7, sa = (bi%2===0) ? 1 : 0.68;
-    ctx.strokeStyle = rgba(colCur, 0.055*sa+0.02); ctx.lineWidth = 34; streamPath(bx, 11, ph);
-    ctx.strokeStyle = rgba(colCur, 0.13*sa+0.03); ctx.lineWidth = 17; streamPath(bx, 10, ph);
-    ctx.strokeStyle = rgba(colCur, 0.34*sa+0.06); ctx.lineWidth = 6.5;  streamPath(bx, 8, ph);
-    ctx.strokeStyle = 'rgba(255,255,255,0.92)'; ctx.lineWidth = 2.2; streamPath(bx, 7, ph);
+    ctx.strokeStyle = rgba(colCur, 0.032*sa+0.012); ctx.lineWidth = 26; streamPath(bx, 11, ph);
+    ctx.strokeStyle = rgba(colCur, 0.075*sa+0.02); ctx.lineWidth = 12; streamPath(bx, 10, ph);
+    ctx.strokeStyle = rgba(colCur, 0.19*sa+0.04); ctx.lineWidth = 4.5;  streamPath(bx, 8, ph);
+    ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 1.3; streamPath(bx, 7, ph);
     /* braided companion strands winding around the core */
-    ctx.strokeStyle = rgba(colCur, 0.30*sa+0.05); ctx.lineWidth = 1.6; streamPath(bx, 14, ph+2.1);
-    ctx.strokeStyle = rgba(colCur, 0.24*sa+0.04); ctx.lineWidth = 1.4; streamPath(bx, 14, ph+4.2);
+    ctx.strokeStyle = rgba(colCur, 0.17*sa+0.03); ctx.lineWidth = 1.3; streamPath(bx, 14, ph+2.1);
+    ctx.strokeStyle = rgba(colCur, 0.14*sa+0.03); ctx.lineWidth = 1.1; streamPath(bx, 14, ph+4.2);
     /* falling sparks on the stream */
     for (var k=0;k<5;k++){
       var vv = (((now*(0.05+k*0.017) + k*H*0.37 + bi*90) % (H+40)) - 20) / H;
@@ -408,7 +417,7 @@ function frame(now){
     var xx2 = PX(bounds[o.s], Math.max(0, Math.min(1, o.y))) + Math.sin(yy2*0.011 + ph2)*8;
     var pulse = 0.75 + 0.25*Math.sin(now*0.0016 + o.ph);
     var og = ctx.createRadialGradient(xx2,yy2,0,xx2,yy2,o.r*pulse);
-    og.addColorStop(0,'rgba(255,255,255,0.30)'); og.addColorStop(0.35, rgba(colCur,0.34)); og.addColorStop(1,'rgba(0,0,0,0)');
+    og.addColorStop(0,'rgba(255,255,255,0.15)'); og.addColorStop(0.35, rgba(colCur,0.17)); og.addColorStop(1,'rgba(0,0,0,0)');
     ctx.fillStyle = og; ctx.beginPath(); ctx.arc(xx2,yy2,o.r*pulse,0,6.283); ctx.fill();
   });
 
@@ -421,9 +430,40 @@ function frame(now){
     var mx=(ax+bx)/2 + Math.sin(pu.e.ph)*9, my=(ay+by)/2 + Math.cos(pu.e.ph*1.3)*7;
     var u = pu.t, iu = 1-u;
     var x = iu*iu*ax + 2*iu*u*mx + u*u*bx, y = iu*iu*ay + 2*iu*u*my + u*u*by;
-    var g2 = ctx.createRadialGradient(x,y,0,x,y,9+pu.sz*3);
-    g2.addColorStop(0,'rgba(255,255,255,0.98)'); g2.addColorStop(0.35, rgba(colCur,0.8)); g2.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle = g2; ctx.beginPath(); ctx.arc(x,y,9+pu.sz*3,0,6.283); ctx.fill();
+    var g2 = ctx.createRadialGradient(x,y,0,x,y,6+pu.sz*2);
+    g2.addColorStop(0,'rgba(255,255,255,0.8)'); g2.addColorStop(0.35, rgba(colCur,0.5)); g2.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle = g2; ctx.beginPath(); ctx.arc(x,y,6+pu.sz*2,0,6.283); ctx.fill();
+  });
+
+  /* chains: signal travels box-to-box; on arrival the next box lights up and fires it onward */
+  chainTimer -= dt/16.7;
+  if (chainTimer<=0 && chains.length<3){ spawnChain(); chainTimer = 50+Math.random()*45; }
+  chains = chains.filter(function(ch){ return ch.row < NROW-1; });
+  chains.forEach(function(ch){
+    var A = nodes[ch.col*NROW + ch.row], B = nodes[ch.tc*NROW + ch.row + 1];
+    if (!A || !B){ ch.row = NROW; return; }
+    ch.t += ch.sp * (dt/16.7);
+    if (ch.t>=1){
+      hitFlash(B);
+      ch.col = ch.tc; ch.row += 1; ch.t = 0; ch.tc = ch.col;
+      if (ch.row < NROW-1 && Math.random()<0.30){
+        var nc = ch.col + (Math.random()<0.5 ? -1 : 1);
+        if (nc>=0 && nc<5) ch.tc = nc;
+      }
+      return;
+    }
+    var ax=PX(A.x,A.y), ay=PY(A.y), bx=PX(B.x,B.y), by=PY(B.y);
+    var mx=(ax+bx)/2 + (ch.tc!==ch.col ? (bx-ax)*0.08 : 4), my=(ay+by)/2;
+    function cpos(u){ var iu=1-u; return [iu*iu*ax + 2*iu*u*mx + u*u*bx, iu*iu*ay + 2*iu*u*my + u*u*by]; }
+    var head = cpos(ch.t), tail = cpos(Math.max(0, ch.t-0.22));
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = rgba(colCur, 0.55); ctx.lineWidth = 6;
+    ctx.beginPath(); ctx.moveTo(tail[0],tail[1]); ctx.lineTo(head[0],head[1]); ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.lineWidth = 2.4;
+    ctx.beginPath(); ctx.moveTo(tail[0],tail[1]); ctx.lineTo(head[0],head[1]); ctx.stroke();
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath(); ctx.arc(head[0], head[1], 2.6, 0, 6.283); ctx.fill();
+    ctx.lineCap = 'butt';
   });
 
   /* nodes glow + random flares */
@@ -433,11 +473,11 @@ function frame(now){
     var tw = 0.55 + 0.45*Math.sin(now*0.002 + n.tw);
     var r = 2 + n.fl*5 + tw*0.7;
     var depthK = 0.65 + 0.55*n.y, depthA = 0.72 + 0.38*n.y;
-    var g3 = ctx.createRadialGradient(PX(n.x,n.y), PY(n.y), 0, PX(n.x,n.y), PY(n.y), r*3.2*depthK);
-    g3.addColorStop(0,'rgba(255,255,255,'+((0.75+n.fl*0.25)*depthA)+')');
-    g3.addColorStop(0.3, rgba(colCur, (0.5*tw + n.fl*0.4)*depthA));
+    var g3 = ctx.createRadialGradient(PX(n.x,n.y), PY(n.y), 0, PX(n.x,n.y), PY(n.y), r*2.3*depthK);
+    g3.addColorStop(0,'rgba(255,255,255,'+((0.5+n.fl*0.4)*depthA)+')');
+    g3.addColorStop(0.3, rgba(colCur, (0.3*tw + n.fl*0.45)*depthA));
     g3.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle = g3; ctx.beginPath(); ctx.arc(PX(n.x,n.y), PY(n.y), r*3.2*depthK, 0, 6.283); ctx.fill();
+    ctx.fillStyle = g3; ctx.beginPath(); ctx.arc(PX(n.x,n.y), PY(n.y), r*2.3*depthK, 0, 6.283); ctx.fill();
   });
 
   /* decision path tracing */
