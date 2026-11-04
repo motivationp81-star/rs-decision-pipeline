@@ -31,6 +31,9 @@
   .stat .val.pink{color:var(--pink)} .stat .val.green{color:var(--green)}
   .stat .sub{font-size:8.5px;color:var(--mut);letter-spacing:.08em}
   .spark{display:inline-block;vertical-align:middle;margin-left:6px}
+  .tickbar{display:flex;gap:2px;margin:4px 0 3px}
+  .tickbar i{width:7px;height:5px;background:rgba(130,160,210,.16);display:block}
+  .tickbar i.on{background:var(--pink);box-shadow:0 0 6px rgba(255,61,139,.8)}
   .tabs{display:flex;gap:6px;align-items:center;padding-top:8px}
   .tabs span{font-size:9px;letter-spacing:.18em;padding:4px 9px;border:1px solid rgba(140,180,255,.35);border-radius:3px;color:#bcd6ff}
   .tabs span.on{background:var(--case);border-color:var(--case);color:#fff;transition:background .8s}
@@ -59,8 +62,10 @@
   .node small{display:block;font-size:8px;color:var(--mut);margin-left:11px;letter-spacing:.05em}
   .node.nl{transform:translate(-2%,-50%)}
   .node.nr{transform:translate(-90%,-50%)}
-  .node.hot{outline:1.5px solid var(--case);outline-offset:5px;border-radius:2px;background:rgba(0,0,0,.45);box-shadow:0 0 22px var(--case-dim),inset 0 0 12px rgba(0,0,0,.6);padding:3px 7px;transition:outline-color .8s,box-shadow .8s}
+  .node em{display:none;font-style:normal}
+  .node.hot{outline:2px solid var(--case);outline-offset:5px;border-radius:2px;background:rgba(0,0,0,.55);box-shadow:0 0 30px var(--case-dim),inset 0 0 14px rgba(0,0,0,.65);padding:7px 10px;font-size:12px;z-index:6;transition:outline-color .8s,box-shadow .8s}
   .node.hot small{color:#ffb3ba}
+  .node.hot em{display:block;font-size:8.5px;color:#cfe2ff;margin-top:3px;letter-spacing:.04em;line-height:1.5}
 
   /* ===== BOTTOM STRIP ===== */
   .strip{display:grid;grid-template-columns:1.05fr 1.1fr 1.25fr 1fr .95fr;gap:10px;margin-top:10px}
@@ -104,10 +109,10 @@
       </div>
     </div>
     <div class="stats mono">
-      <div class="stat"><div class="lab">DECISIONS · THIS RUN</div><div class="val" id="stDec">61</div><div class="sub">SIM · one loop · 18 000</div></div>
+      <div class="stat"><div class="lab">DECISIONS · THIS RUN</div><div class="val" id="stDec">61</div><div class="tickbar" id="decBar"></div><div class="sub">SIM · one loop · 18 000</div></div>
       <div class="stat"><div class="lab">MEDIAN LATENCY · REPORTED</div><div class="val">~<span id="stLat">256</span><span style="font-size:14px"> MS</span><canvas class="spark" id="sparkCv" width="86" height="22"></canvas></div><div class="sub">public demo · not SLA</div></div>
       <div class="stat"><div class="lab">COST · 10 000 DECISIONS</div><div class="val pink">≈ $0.42</div><div class="sub">per case · flat</div></div>
-      <div class="stat"><div class="lab">CONFIDENCE · LIVE</div><div class="val green" id="stConf">0.94 <span style="font-size:12px;background:#1d7a38;color:#cbffd9;padding:2px 8px;border-radius:3px;vertical-align:4px">PASS</span></div><div class="sub">calibrate on yours · gate ≥ 0.85</div></div>
+      <div class="stat"><div class="lab">CONFIDENCE · LIVE</div><div class="val green" id="stConf"><span id="confVal">0.94</span> <span id="confPill" style="font-size:12px;background:#1d7a38;color:#cbffd9;padding:2px 8px;border-radius:3px;vertical-align:4px">PASS</span></div><div class="sub">calibrate on yours · gate ≥ 0.85</div></div>
     </div>
     <div class="tabs mono"><span>STATE</span><span>ASK</span><span class="on" id="tabGate">GATE</span><span>CODE</span></div>
   </header>
@@ -210,12 +215,19 @@ var COLS = [
     ["log · written","state + queue"],["report · to Vikram","link ke saath"],["alert · raised","gadbad par"],["summary · saved",""]]}
 ];
 var CASES = [
-  {name:"Daily Upload Round", sub:'Choice · <b>which part, which channel</b> · gate ≥ rules', color:"#ff2a3c", cam:[0.16,0.40]},
-  {name:"Instagram Reply",    sub:'Choice · <b>reply as manager</b> · spam → hold',          color:"#3dff7a", cam:[0.34,0.58]},
-  {name:"New Part Intake",    sub:'Check · <b>title ≤ 100 · file · thumbnail</b>',           color:"#ffd23e", cam:[0.52,0.36]},
-  {name:"Business Inquiry",   sub:'Gate · <b>no deal without Vikram</b> · draft only',       color:"#ff3d8b", cam:[0.68,0.60]},
-  {name:"GitHub Upkeep",      sub:'Check · <b>metrics · snake · 3D city</b> · weekly',       color:"#25e6ff", cam:[0.84,0.42]},
-  {name:"Channel Guard",      sub:'Rule · <b>one channel stops, never all</b>',              color:"#b26bff", cam:[0.50,0.72]}
+  {name:"Daily Upload Round", sub:'Choice · <b>which part, which channel</b> · gate ≥ rules', color:"#ff2a3c", cam:[0.16,0.40], zoom:1.07},
+  {name:"Instagram Reply",    sub:'Choice · <b>reply as manager</b> · spam → hold',          color:"#3dff7a", cam:[0.34,0.58], zoom:1.24},
+  {name:"New Part Intake",    sub:'Check · <b>title ≤ 100 · file · thumbnail</b>',           color:"#ffd23e", cam:[0.52,0.36], zoom:1.12},
+  {name:"Business Inquiry",   sub:'Gate · <b>no deal without Vikram</b> · draft only',       color:"#ff3d8b", cam:[0.68,0.60], zoom:1.29},
+  {name:"GitHub Upkeep",      sub:'Check · <b>metrics · snake · 3D city</b> · weekly',       color:"#25e6ff", cam:[0.84,0.42], zoom:1.16},
+  {name:"Channel Guard",      sub:'Rule · <b>one channel stops, never all</b>',              color:"#b26bff", cam:[0.50,0.72], zoom:1.20}
+];
+var DETAILS = [
+  ["ist · 9 channels","as manager · english","pending · no spam","drive · original file","price kabhi final nahi","production tokens","seedha Vikram ko"],
+  ["jawab ya hold","spam hai to ruk","100 ke andar hi","round ka map dekho","kya, kab, kahan","kam se kam 7 aur"],
+  ["purani halat padho","ye round kaun sa","naam bilkul waisa","pehle API jaancho","jo diya wahi lage","teen jawab, ek faisla","sabse upar wala"],
+  ["niyam se bada kuch nahi","deal = Vikram ki marzi","ek ruke, baaki chale","garam, insaani jawab","12 atke to badli","aage badhao","kuch book nahi karna"],
+  ["API se · public","manager bankar","shabd-ba-shabd save","halat + kataar dono","link ke saath report","turant khabar do","aakhri khabar save"]
 ];
 var UCNAMES = ["upload round","insta reply","part intake","business DM","github check","channel guard"];
 var LOGPOOL = [
@@ -243,7 +255,7 @@ COLS.forEach(function(col, ci){
     var el = document.createElement('div');
     el.className = 'node mono' + (ci===0?' nl':(ci===4?' nr':'')); el.style.left = (x*100)+'%'; el.style.top = (y*100)+'%';
     el.style.setProperty('--nc', CASES[0].color);
-    el.innerHTML = nd[0] + (nd[1] ? '<small>'+nd[1]+'</small>' : '');
+    el.innerHTML = nd[0] + (nd[1] ? '<small>'+nd[1]+'</small>' : '') + '<em>'+DETAILS[ci][ni]+'</em>';
     chipsEl.appendChild(el);
     nodes.push({x:x, y:y, col:ci, el:el, tw:Math.random()*6.28, fl:0});
   });
@@ -284,6 +296,9 @@ var colCur = [255,42,60], colTgt = [255,42,60];
 function hexRgb(h){ return [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)]; }
 function rgba(c,a){ return 'rgba('+(c[0]|0)+','+(c[1]|0)+','+(c[2]|0)+','+a+')'; }
 var camX=0.16, camY=0.40, camTX=0.16, camTY=0.40, t0=performance.now();
+var zoomCur=1.07, zoomTgt=1.07;
+var orbs = [];
+for (var ob=0; ob<5; ob++) orbs.push({s:ob%4, y:Math.random(), sp:0.008+Math.random()*0.014, r:26+Math.random()*30, ph:Math.random()*6.28});
 
 function streamPath(cx, wob, ph){
   ctx.beginPath();
@@ -301,7 +316,8 @@ function frame(now){
   /* camera: drift to case region + breathing wander */
   camX += (camTX-camX)*0.012; camY += (camTY-camY)*0.012;
   var wx = camX + Math.sin(now*0.00011)*0.04, wy = camY + Math.cos(now*0.00009)*0.035;
-  var zoom = 1.05 + Math.sin(now*0.00013)*0.02;
+  zoomCur += (zoomTgt-zoomCur)*0.016;
+  var zoom = zoomCur + Math.sin(now*0.00013)*0.018;
   var cam = document.getElementById('cam');
   cam.style.transform = 'translate('+((0.5-wx)*52)+'px,'+((0.5-wy)*34)+'px) scale('+zoom+')';
 
@@ -343,6 +359,18 @@ function frame(now){
       g.addColorStop(0,'rgba(255,255,255,0.95)'); g.addColorStop(0.4, rgba(colCur,0.55)); g.addColorStop(1,'rgba(0,0,0,0)');
       ctx.fillStyle = g; ctx.beginPath(); ctx.arc(xx,yy,7,0,6.283); ctx.fill();
     }
+  });
+
+  /* big drifting glow orbs on the streams */
+  orbs.forEach(function(o){
+    o.y += o.sp * (dt/16.7) * 0.14; if (o.y>1.08) o.y = -0.08;
+    var bx2 = bounds[o.s]*W, yy2 = o.y*H;
+    var ph2 = now*0.0016 + o.s*1.7;
+    var xx2 = bx2 + Math.sin(yy2*0.011 + ph2)*13;
+    var pulse = 0.75 + 0.25*Math.sin(now*0.0016 + o.ph);
+    var og = ctx.createRadialGradient(xx2,yy2,0,xx2,yy2,o.r*pulse);
+    og.addColorStop(0,'rgba(255,255,255,0.30)'); og.addColorStop(0.35, rgba(colCur,0.34)); og.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle = og; ctx.beginPath(); ctx.arc(xx2,yy2,o.r*pulse,0,6.283); ctx.fill();
   });
 
   /* pulses along edges */
@@ -431,6 +459,8 @@ function setCase(i){
   nodes.forEach(function(n){ n.el.style.setProperty('--nc', cs.color); n.el.classList.remove('hot'); });
   var hot = nodes[i*5 + 2]; if (hot) hot.el.classList.add('hot');
   var hot2 = nodes[12 + (i%6)]; if (hot2) hot2.el.classList.add('hot');
+  var hot3 = nodes[(i*3 + 24) % nodes.length]; if (hot3) hot3.el.classList.add('hot');
+  zoomTgt = cs.zoom;
   Array.prototype.forEach.call(ucWrap.children, function(el, j){ el.classList.toggle('on', j===i); });
   traceTimer = 30;
 }
@@ -439,11 +469,24 @@ setCase(0);
 
 /* ============ COUNTERS ============ */
 var dec = 61;
+var decBar = document.getElementById('decBar'), decSegs = [];
+for (var ds=0; ds<24; ds++){ var seg = document.createElement('i'); decBar.appendChild(seg); decSegs.push(seg); }
 setInterval(function(){
-  dec += 3 + ((Math.random()*22)|0);
+  dec += 150 + ((Math.random()*280)|0);
   document.getElementById('stDec').textContent = dec.toLocaleString('en-IN');
+  var lit = Math.min(24, Math.round(24 * dec / 12000));
+  decSegs.forEach(function(sg, si){ sg.classList.toggle('on', si < lit); });
   document.getElementById('stLat').textContent = 248 + ((Math.random()*18)|0);
-  if (Math.random()<0.3) document.getElementById('stConf').firstChild.textContent = (0.88 + Math.random()*0.11).toFixed(2) + ' ';
+  if (Math.random()<0.45){
+    var hold = Math.random() < 0.22;
+    var cv2 = hold ? (0.68 + Math.random()*0.16) : (0.86 + Math.random()*0.13);
+    document.getElementById('confVal').textContent = cv2.toFixed(2);
+    var pill2 = document.getElementById('confPill');
+    pill2.textContent = hold ? 'HOLD' : 'PASS';
+    pill2.style.background = hold ? '#8c1d2f' : '#1d7a38';
+    pill2.style.color = hold ? '#ffd7dd' : '#cbffd9';
+    document.getElementById('stConf').style.color = hold ? '#ff5d73' : '';
+  }
 }, 700);
 
 /* header sparkline */
