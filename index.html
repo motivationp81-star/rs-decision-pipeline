@@ -69,12 +69,12 @@
   .node.nl{transform:translate(-2%,-50%)}
   .node.nr{transform:translate(-90%,-50%)}
   .node em{display:none;font-style:normal}
-  .node.hot{opacity:1;width:230px;height:auto;border:2px solid var(--case);border-radius:6px;background:linear-gradient(180deg,color-mix(in srgb,var(--case) 55%,transparent),color-mix(in srgb,var(--case) 16%,transparent));box-shadow:0 0 28px var(--case-dim),0 0 10px var(--case-dim),inset 0 0 14px rgba(0,0,0,.35);padding:16px 22px;font-size:17px;z-index:6;text-shadow:0 0 8px rgba(0,0,0,.9),0 1px 4px #000;transition:border-color .8s,box-shadow .8s}
-  #lens{position:absolute;width:170px;height:170px;border:2px solid var(--case);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:4;opacity:.38;box-shadow:0 0 16px var(--case-dim),inset 0 0 16px rgba(0,0,0,.35);transition:left 1.4s ease,top 1.4s ease,border-color .8s;animation:lensPulse 3.2s ease-in-out infinite}
+  .node.hot{opacity:1;width:132px;height:36px;border:1.6px solid var(--case);background:color-mix(in srgb,var(--case) 30%,rgba(5,7,14,.85));box-shadow:0 0 9px var(--case-dim);z-index:6}
+  #lens{display:none;position:absolute;width:170px;height:170px;border:2px solid var(--case);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:4;opacity:.38;box-shadow:0 0 16px var(--case-dim),inset 0 0 16px rgba(0,0,0,.35);transition:left 1.4s ease,top 1.4s ease,border-color .8s;animation:lensPulse 3.2s ease-in-out infinite}
   @keyframes lensPulse{0%,100%{scale:1;opacity:.30}50%{scale:1.05;opacity:.45}}
-  .node.hit{border-color:#ffffff;box-shadow:0 0 24px var(--case),0 0 9px rgba(255,255,255,.85);background:rgba(24,32,54,.96);z-index:5}
+  .node.hit{border-color:rgba(255,255,255,.75)}
   .node.hot small{color:#ffb3ba}
-  .node.hot em{display:block;font-size:8.5px;color:#cfe2ff;margin-top:3px;letter-spacing:.04em;line-height:1.5}
+  .node.hot em{color:#cfe2ff}
 
   /* ===== BOTTOM STRIP ===== */
   .strip{display:grid;grid-template-columns:1.05fr 1.1fr 1.25fr 1fr .95fr;gap:10px;margin-top:10px}
@@ -310,7 +310,7 @@ for (var p=0; p<55; p++){
 var trace = null, traceTimer = 240;
 /* ===== CHAINS: one bright signal runs from box to box down a column — the reel's core motion ===== */
 var chains = [], chainTimer = 15;
-function hitFlash(n){ if (!n || !n.el) return; n.fl = 1; n.el.classList.add('hit'); setTimeout(function(){ n.el.classList.remove('hit'); }, 430); }
+function hitFlash(n){ /* boxes stay still now — only the travelling line animates */ }
 function spawnChain(){
   var col = (Math.random()*5)|0;
   chains.push({col:col, row:0, tc:col, t:0, sp:0.021+Math.random()*0.009});
@@ -341,13 +341,9 @@ function frame(now){
   var dt = Math.min(50, now - t0); t0 = now;
   /* colour morph */
   for (var i=0;i<3;i++) colCur[i] += (colTgt[i]-colCur[i])*0.045;
-  /* camera: drift to case region + breathing wander */
-  camX += (camTX-camX)*0.012; camY += (camTY-camY)*0.012;
-  var wx = camX + Math.sin(now*0.00011)*0.04, wy = camY + Math.cos(now*0.00009)*0.035;
-  zoomCur += (zoomTgt-zoomCur)*0.016;
-  var zoom = zoomCur + Math.sin(now*0.00013)*0.018;
+  /* camera frozen: boxes never move or resize — only lines animate */
   var cam = document.getElementById('cam');
-  cam.style.transform = 'translate('+((0.5-wx)*52)+'px,'+((0.5-wy)*34)+'px) scale('+zoom+')';
+  cam.style.transform = 'scale(1.03)';
 
   ctx.clearRect(0,0,W,H);
   ctx.globalCompositeOperation = 'lighter';
@@ -410,22 +406,11 @@ function frame(now){
     }
   });
 
-  /* big drifting glow orbs on the streams */
-  orbs.forEach(function(o){
-    o.y += o.sp * (dt/16.7) * 0.14; if (o.y>1.08) o.y = -0.08;
-    var yy2 = PY(Math.max(0, Math.min(1, o.y)));
-    var ph2 = now*0.0016 + o.s*1.7;
-    var xx2 = PX(bounds[o.s], Math.max(0, Math.min(1, o.y))) + Math.sin(yy2*0.011 + ph2)*8;
-    var pulse = 0.75 + 0.25*Math.sin(now*0.0016 + o.ph);
-    var og = ctx.createRadialGradient(xx2,yy2,0,xx2,yy2,o.r*pulse);
-    og.addColorStop(0,'rgba(255,255,255,0.15)'); og.addColorStop(0.35, rgba(colCur,0.17)); og.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle = og; ctx.beginPath(); ctx.arc(xx2,yy2,o.r*pulse,0,6.283); ctx.fill();
-  });
 
   /* pulses along edges */
   pulses.forEach(function(pu){
     pu.t += pu.sp * pu.dir * (dt/16.7);
-    if (pu.t>1){ pu.t=0; pu.e = edges[(Math.random()*edges.length)|0]; nodes[pu.e.a].fl = 1; }
+    if (pu.t>1){ pu.t=0; pu.e = edges[(Math.random()*edges.length)|0]; }
     var A = nodes[pu.e.a], B = nodes[pu.e.b];
     var ax=PX(A.x,A.y), ay=PY(A.y), bx=PX(B.x,B.y), by=PY(B.y);
     var mx=(ax+bx)/2 + Math.sin(pu.e.ph)*9, my=(ay+by)/2 + Math.cos(pu.e.ph*1.3)*7;
@@ -479,14 +464,12 @@ function frame(now){
 
   /* nodes glow + random flares */
   nodes.forEach(function(n){
-    if (Math.random()<0.0016) n.fl = 1;
-    n.fl = Math.max(0, n.fl - 0.012);
     var tw = 0.55 + 0.45*Math.sin(now*0.002 + n.tw);
-    var r = 2 + n.fl*5 + tw*0.7;
+    var r = 2 + tw*0.7;
     var depthK = 0.65 + 0.55*n.y, depthA = 0.72 + 0.38*n.y;
     var g3 = ctx.createRadialGradient(PX(n.x,n.y), PY(n.y), 0, PX(n.x,n.y), PY(n.y), r*2.3*depthK);
-    g3.addColorStop(0,'rgba(255,255,255,'+((0.5+n.fl*0.4)*depthA)+')');
-    g3.addColorStop(0.3, rgba(colCur, (0.3*tw + n.fl*0.45)*depthA));
+    g3.addColorStop(0,'rgba(255,255,255,'+(0.5*depthA)+')');
+    g3.addColorStop(0.3, rgba(colCur, (0.3*tw)*depthA));
     g3.addColorStop(1,'rgba(0,0,0,0)');
     ctx.fillStyle = g3; ctx.beginPath(); ctx.arc(PX(n.x,n.y), PY(n.y), r*2.3*depthK, 0, 6.283); ctx.fill();
   });
