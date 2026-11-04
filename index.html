@@ -35,7 +35,7 @@
   .tabs span{font-size:9px;letter-spacing:.18em;padding:4px 9px;border:1px solid rgba(140,180,255,.35);border-radius:3px;color:#bcd6ff}
   .tabs span.on{background:var(--case);border-color:var(--case);color:#fff;transition:background .8s}
   .profiles{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 2px}
-  .profiles .p{font-size:9.5px;letter-spacing:.06em;padding:3px 8px;border:1px solid rgba(140,180,255,.22);border-radius:20px;color:#a9c6ee;background:rgba(20,30,55,.35)}
+  .profiles .p{font-size:9.5px;letter-spacing:.06em;padding:3px 8px;border:1px solid rgba(140,180,255,.22);border-radius:20px;color:#a9c6ee;background:rgba(20,30,55,.35);max-width:100%;white-space:normal;line-height:1.6}
   .profiles .p b{color:#fff;font-weight:700}
   .profiles .p i{font-style:normal;color:var(--cyan)}
 
@@ -227,7 +227,7 @@ var LOGPOOL = [
 var chipsEl = document.getElementById('chips');
 var stage = document.getElementById('stageWrap');
 var nodes = [], edges = [];
-var colX = [0.085, 0.285, 0.50, 0.715, 0.915];
+var colX = [0.115, 0.305, 0.50, 0.695, 0.885];
 COLS.forEach(function(col, ci){
   var hd = document.createElement('div');
   hd.className = 'colhead mono'; hd.style.left = (colX[ci]*100)+'%';
@@ -293,10 +293,10 @@ function frame(now){
   for (var i=0;i<3;i++) colCur[i] += (colTgt[i]-colCur[i])*0.045;
   /* camera: drift to case region + breathing wander */
   camX += (camTX-camX)*0.012; camY += (camTY-camY)*0.012;
-  var wx = camX + Math.sin(now*0.00011)*0.05, wy = camY + Math.cos(now*0.00009)*0.045;
-  var zoom = 1.16 + Math.sin(now*0.00013)*0.05;
+  var wx = camX + Math.sin(now*0.00011)*0.04, wy = camY + Math.cos(now*0.00009)*0.035;
+  var zoom = 1.10 + Math.sin(now*0.00013)*0.04;
   var cam = document.getElementById('cam');
-  cam.style.transform = 'translate('+((0.5-wx)*130)+'px,'+((0.5-wy)*90)+'px) scale('+zoom+')';
+  cam.style.transform = 'translate('+((0.5-wx)*72)+'px,'+((0.5-wy)*48)+'px) scale('+zoom+')';
 
   ctx.clearRect(0,0,W,H);
   ctx.globalCompositeOperation = 'lighter';
@@ -309,13 +309,13 @@ function frame(now){
   });
 
   /* web edges */
-  ctx.lineWidth = 0.7;
+  ctx.lineWidth = 1.0;
   edges.forEach(function(e, idx){
     var A = nodes[e.a], B = nodes[e.b];
     var ax=A.x*W, ay=A.y*H, bx=B.x*W, by=B.y*H;
     var mx=(ax+bx)/2 + Math.sin(e.ph)*26, my=(ay+by)/2 + Math.cos(e.ph*1.3)*20;
-    var shimmer = 0.05 + 0.05*Math.sin(now*0.0011 + e.ph);
-    ctx.strokeStyle = rgba(colCur, shimmer + (idx%7===0?0.05:0));
+    var shimmer = 0.15 + 0.08*Math.sin(now*0.0011 + e.ph);
+    ctx.strokeStyle = rgba(colCur, shimmer + (idx%7===0?0.10:0));
     ctx.beginPath(); ctx.moveTo(ax,ay); ctx.quadraticCurveTo(mx,my,bx,by); ctx.stroke();
   });
 
@@ -323,9 +323,10 @@ function frame(now){
   var bounds = [0.185, 0.395, 0.605, 0.815];
   bounds.forEach(function(bx, bi){
     var cx = bx*W, ph = now*0.0016 + bi*1.7;
-    ctx.strokeStyle = rgba(colCur, 0.05); ctx.lineWidth = 15; streamPath(cx, 16, ph);
-    ctx.strokeStyle = rgba(colCur, 0.13); ctx.lineWidth = 5;  streamPath(cx, 13, ph);
-    ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 1.3; streamPath(cx, 10, ph);
+    ctx.strokeStyle = rgba(colCur, 0.05); ctx.lineWidth = 30; streamPath(cx, 18, ph);
+    ctx.strokeStyle = rgba(colCur, 0.11); ctx.lineWidth = 16; streamPath(cx, 16, ph);
+    ctx.strokeStyle = rgba(colCur, 0.24); ctx.lineWidth = 6;  streamPath(cx, 13, ph);
+    ctx.strokeStyle = 'rgba(255,255,255,0.78)'; ctx.lineWidth = 1.8; streamPath(cx, 10, ph);
     /* falling sparks on the stream */
     for (var k=0;k<5;k++){
       var yy = ((now*(0.05+k*0.017) + k*H*0.37 + bi*90) % (H+40)) - 20;
@@ -346,9 +347,9 @@ function frame(now){
     var mx=(ax+bx)/2 + Math.sin(pu.e.ph)*26, my=(ay+by)/2 + Math.cos(pu.e.ph*1.3)*20;
     var u = pu.t, iu = 1-u;
     var x = iu*iu*ax + 2*iu*u*mx + u*u*bx, y = iu*iu*ay + 2*iu*u*my + u*u*by;
-    var g2 = ctx.createRadialGradient(x,y,0,x,y,6+pu.sz*2);
-    g2.addColorStop(0,'rgba(255,255,255,0.9)'); g2.addColorStop(0.35, rgba(colCur,0.6)); g2.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle = g2; ctx.beginPath(); ctx.arc(x,y,6+pu.sz*2,0,6.283); ctx.fill();
+    var g2 = ctx.createRadialGradient(x,y,0,x,y,8+pu.sz*2.5);
+    g2.addColorStop(0,'rgba(255,255,255,0.95)'); g2.addColorStop(0.35, rgba(colCur,0.7)); g2.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle = g2; ctx.beginPath(); ctx.arc(x,y,8+pu.sz*2.5,0,6.283); ctx.fill();
   });
 
   /* nodes glow + random flares */
@@ -476,7 +477,7 @@ setInterval(function(){
     pq.appendChild(d);
   });
   var code = document.getElementById('codeBox');
-  code.innerHTML = '<span class="k">answer</span> = route(choice, gate)\n<span class="k">if</span> answer.confidence >= <span class="s">0.85</span>:\n    act(answer)  <span class="c"># code, not LLM</span>\n<span class="k">else</span>:\n    hold_for_vikram()';
+  code.innerHTML = '<span class="k">answer</span> = route(choice, gate)<br><span class="k">if</span> answer.confidence >= <span class="s">0.85</span>:<br>&nbsp;&nbsp;&nbsp;&nbsp;act(answer) <span class="c">// code, not LLM</span><br><span class="k">else</span>:<br>&nbsp;&nbsp;&nbsp;&nbsp;hold_for_vikram()';
   var split = document.getElementById('split');
   var srows = [['Muse decides', 8, '#ff3d8b'], ['Vikram approves', 5, '#ffd23e'], ['API acts', 9, '#25e6ff']];
   srows.forEach(function(r){
