@@ -50,7 +50,7 @@
   #stageWrap{position:relative;height:560px;margin-top:2px;overflow:hidden;border-top:1px solid rgba(120,180,255,.10);border-bottom:1px solid rgba(120,180,255,.10)}
   #cam{position:absolute;inset:-30px -40px;will-change:transform}
   #web{position:absolute;inset:0;width:100%;height:100%}
-  .colhead{position:absolute;top:38px;transform:translateX(-50%);font-size:10px;letter-spacing:.22em;color:#9fb8dd;white-space:nowrap;z-index:4}
+  .colhead{position:absolute;top:8px;transform:translateX(-50%);font-size:10px;letter-spacing:.22em;color:#9fb8dd;white-space:nowrap;z-index:5;text-shadow:0 1px 6px #000}
   .colhead.nl{transform:translateX(0)}
   .colhead.nr{transform:translateX(-100%)}
   .colhead b{color:var(--case);font-weight:800;transition:color .8s}
@@ -230,13 +230,13 @@ var LOGPOOL = [
 /* ============ BUILD NODES ============ */
 var chipsEl = document.getElementById('chips');
 var stage = document.getElementById('stageWrap');
-var nodes = [], edges = [];
+var nodes = [], edges = [], headers = [];
 var colX = [0.13, 0.315, 0.50, 0.685, 0.87];
 COLS.forEach(function(col, ci){
   var hd = document.createElement('div');
   hd.className = 'colhead mono' + (ci===0?' nl':(ci===4?' nr':'')); hd.style.left = (colX[ci]*100)+'%';
   hd.innerHTML = col.h.replace(/^(\d+ · )/, '<b>$1</b>');
-  chipsEl.appendChild(hd);
+  stage.appendChild(hd); headers.push({el:hd, ci:ci});
   col.nodes.forEach(function(nd, ni){
     var x = colX[ci] + (Math.sin(ni*2.7+ci)*0.012);
     var y = 0.14 + ni*0.12 + Math.sin(ni*1.9+ci*3)*0.014;
@@ -268,7 +268,9 @@ for (var s=0; s<130; s++) stars.push({x:Math.random(), y:Math.random(), r:Math.r
 /* ============ CANVAS ============ */
 var cv = document.getElementById('web'), ctx = cv.getContext('2d');
 var W=0, H=0;
-function fit(){ var r = stage.getBoundingClientRect(); W = cv.width = r.width+80; H = cv.height = r.height+60; }
+function fit(){ var r = stage.getBoundingClientRect(); W = cv.width = r.width+80; H = cv.height = r.height+60;
+  headers.forEach(function(hd){ hd.el.style.left = (-40 + colX[hd.ci]*(r.width+80)) + 'px'; });
+}
 fit(); window.addEventListener('resize', fit);
 
 var pulses = [];
