@@ -248,8 +248,8 @@ var stage = document.getElementById('stageWrap');
 var nodes = [], edges = [], headers = [];
 var colX = [0.13, 0.315, 0.50, 0.685, 0.87];
 /* fake-3D projection: top of the plane compressed (far), bottom full width (near) — works in every renderer */
-function projFX(x, y){ return 0.5 + (x - 0.5) * (0.80 + 0.20 * y); }
-function projFY(y){ return Math.pow(y, 1.13); }
+function projFX(x, y){ return 0.5 + (x - 0.5) * (0.64 + 0.36 * y); }
+function projFY(y){ return Math.pow(y, 1.24); }
 COLS.forEach(function(col, ci){
   var hd = document.createElement('div');
   hd.className = 'colhead mono' + (ci===0?' nl':(ci===4?' nr':'')); hd.style.left = (colX[ci]*100)+'%';
