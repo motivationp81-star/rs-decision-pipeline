@@ -69,7 +69,7 @@
   .node.nl{transform:translate(-2%,-50%)}
   .node.nr{transform:translate(-90%,-50%)}
   .node em{display:none;font-style:normal}
-  .node.hot{opacity:1;width:230px;height:auto;border:2px solid var(--case);border-radius:6px;background:linear-gradient(180deg,color-mix(in srgb,var(--case) 55%,transparent),color-mix(in srgb,var(--case) 16%,transparent));box-shadow:0 0 75px var(--case-dim),0 0 22px var(--case-dim),inset 0 0 18px rgba(0,0,0,.35);padding:16px 22px;font-size:17px;z-index:6;text-shadow:0 0 8px rgba(0,0,0,.9),0 1px 4px #000;transition:border-color .8s,box-shadow .8s}
+  .node.hot{opacity:1;width:230px;height:auto;border:2px solid var(--case);border-radius:6px;background:linear-gradient(180deg,color-mix(in srgb,var(--case) 55%,transparent),color-mix(in srgb,var(--case) 16%,transparent));box-shadow:0 0 28px var(--case-dim),0 0 10px var(--case-dim),inset 0 0 14px rgba(0,0,0,.35);padding:16px 22px;font-size:17px;z-index:6;text-shadow:0 0 8px rgba(0,0,0,.9),0 1px 4px #000;transition:border-color .8s,box-shadow .8s}
   #lens{position:absolute;width:170px;height:170px;border:2px solid var(--case);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:4;opacity:.38;box-shadow:0 0 16px var(--case-dim),inset 0 0 16px rgba(0,0,0,.35);transition:left 1.4s ease,top 1.4s ease,border-color .8s;animation:lensPulse 3.2s ease-in-out infinite}
   @keyframes lensPulse{0%,100%{scale:1;opacity:.30}50%{scale:1.05;opacity:.45}}
   .node.hit{border-color:#ffffff;box-shadow:0 0 24px var(--case),0 0 9px rgba(255,255,255,.85);background:rgba(24,32,54,.96);z-index:5}
@@ -227,11 +227,11 @@ var COLS = [
 ];
 var CASES = [
   {name:"Daily Upload Round", sub:'Choice · <b>which part, which channel</b> · gate ≥ rules', color:"#ff2a3c", cam:[0.16,0.40], zoom:1.11},
-  {name:"Instagram Reply",    sub:'Choice · <b>reply as manager</b> · spam → hold',          color:"#3dff7a", cam:[0.34,0.58], zoom:1.22},
-  {name:"New Part Intake",    sub:'Check · <b>title ≤ 100 · file · thumbnail</b>',           color:"#ffd23e", cam:[0.52,0.36], zoom:1.24},
+  {name:"Instagram Reply",    sub:'Choice · <b>reply as manager</b> · spam → hold',          color:"#3dff7a", cam:[0.34,0.58], zoom:1.18},
+  {name:"New Part Intake",    sub:'Check · <b>title ≤ 100 · file · thumbnail</b>',           color:"#ffd23e", cam:[0.52,0.36], zoom:1.18},
   {name:"Business Inquiry",   sub:'Gate · <b>no deal without Vikram</b> · draft only',       color:"#ff3d8b", cam:[0.68,0.60], zoom:1.22},
-  {name:"GitHub Upkeep",      sub:'Check · <b>metrics · snake · 3D city</b> · weekly',       color:"#25e6ff", cam:[0.84,0.42], zoom:1.24},
-  {name:"Channel Guard",      sub:'Rule · <b>one channel stops, never all</b>',              color:"#b26bff", cam:[0.50,0.72], zoom:1.24}
+  {name:"GitHub Upkeep",      sub:'Check · <b>metrics · snake · 3D city</b> · weekly',       color:"#25e6ff", cam:[0.84,0.42], zoom:1.18},
+  {name:"Channel Guard",      sub:'Rule · <b>one channel stops, never all</b>',              color:"#b26bff", cam:[0.50,0.72], zoom:1.18}
 ];
 var DETAILS = [
   ["ist · 9 channels","as manager · english","pending · no spam","drive · original file","price kabhi final nahi","production tokens","seedha Vikram ko","limit aaye to sirf wahi","har ghante check"],
@@ -265,7 +265,7 @@ COLS.forEach(function(col, ci){
   stage.appendChild(hd); headers.push({el:hd, ci:ci});
   col.nodes.forEach(function(nd, ni){
     var x = colX[ci];
-    var y = 0.15 + ni*0.09;
+    var y = 0.145 + ni*0.088;
     var el = document.createElement('div');
     el.className = 'node mono' + (ci===0?' nl':(ci===4?' nr':'')); el.style.left = (projFX(x,y)*100)+'%'; el.style.top = (projFY(y)*100)+'%';
     el.style.fontSize = '10.5px';
@@ -390,13 +390,13 @@ function frame(now){
   var bounds = [0.19, 0.295, 0.40, 0.505, 0.61, 0.715, 0.82];
   bounds.forEach(function(bx, bi){
     var ph = now*0.0016 + bi*1.7, sa = (bi%2===0) ? 1 : 0.68;
-    ctx.strokeStyle = rgba(colCur, 0.032*sa+0.012); ctx.lineWidth = 26; streamPath(bx, 11, ph);
-    ctx.strokeStyle = rgba(colCur, 0.075*sa+0.02); ctx.lineWidth = 12; streamPath(bx, 10, ph);
-    ctx.strokeStyle = rgba(colCur, 0.19*sa+0.04); ctx.lineWidth = 4.5;  streamPath(bx, 8, ph);
-    ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 1.3; streamPath(bx, 7, ph);
+    ctx.strokeStyle = rgba(colCur, 0.020*sa+0.008); ctx.lineWidth = 10; streamPath(bx, 11, ph);
+    ctx.strokeStyle = rgba(colCur, 0.045*sa+0.012); ctx.lineWidth = 5; streamPath(bx, 10, ph);
+    ctx.strokeStyle = rgba(colCur, 0.12*sa+0.03); ctx.lineWidth = 2;  streamPath(bx, 8, ph);
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = 0.9; streamPath(bx, 7, ph);
     /* braided companion strands winding around the core */
-    ctx.strokeStyle = rgba(colCur, 0.17*sa+0.03); ctx.lineWidth = 1.3; streamPath(bx, 14, ph+2.1);
-    ctx.strokeStyle = rgba(colCur, 0.14*sa+0.03); ctx.lineWidth = 1.1; streamPath(bx, 14, ph+4.2);
+    ctx.strokeStyle = rgba(colCur, 0.11*sa+0.02); ctx.lineWidth = 1.0; streamPath(bx, 14, ph+2.1);
+    ctx.strokeStyle = rgba(colCur, 0.09*sa+0.02); ctx.lineWidth = 0.9; streamPath(bx, 14, ph+4.2);
     /* falling sparks on the stream */
     for (var k=0;k<5;k++){
       var vv = (((now*(0.05+k*0.017) + k*H*0.37 + bi*90) % (H+40)) - 20) / H;
@@ -455,14 +455,16 @@ function frame(now){
     var ax=PX(A.x,A.y), ay=PY(A.y), bx=PX(B.x,B.y), by=PY(B.y);
     var mx=(ax+bx)/2 + (ch.tc!==ch.col ? (bx-ax)*0.08 : 4), my=(ay+by)/2;
     function cpos(u){ var iu=1-u; return [iu*iu*ax + 2*iu*u*mx + u*u*bx, iu*iu*ay + 2*iu*u*my + u*u*by]; }
-    var head = cpos(ch.t), tail = cpos(Math.max(0, ch.t-0.22));
+    var head = cpos(ch.t), tail = cpos(Math.max(0, ch.t-0.38));
     ctx.lineCap = 'round';
-    ctx.strokeStyle = rgba(colCur, 0.55); ctx.lineWidth = 6;
+    ctx.strokeStyle = rgba(colCur, 0.65); ctx.lineWidth = 8;
     ctx.beginPath(); ctx.moveTo(tail[0],tail[1]); ctx.lineTo(head[0],head[1]); ctx.stroke();
-    ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.lineWidth = 2.4;
+    ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.lineWidth = 3;
     ctx.beginPath(); ctx.moveTo(tail[0],tail[1]); ctx.lineTo(head[0],head[1]); ctx.stroke();
     ctx.fillStyle = '#ffffff';
-    ctx.beginPath(); ctx.arc(head[0], head[1], 2.6, 0, 6.283); ctx.fill();
+    ctx.beginPath(); ctx.arc(head[0], head[1], 3.4, 0, 6.283); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.arc(head[0], head[1], 6.5, 0, 6.283); ctx.stroke();
     ctx.lineCap = 'butt';
   });
 
