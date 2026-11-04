@@ -48,14 +48,16 @@
 
   /* ===== STAGE ===== */
   #stageWrap{position:relative;height:560px;margin-top:2px;overflow:hidden;border-top:1px solid rgba(120,180,255,.10);border-bottom:1px solid rgba(120,180,255,.10)}
-  #cam{position:absolute;inset:-70px -90px;will-change:transform}
+  #cam{position:absolute;inset:-30px -40px;will-change:transform}
   #web{position:absolute;inset:0;width:100%;height:100%}
-  .colhead{position:absolute;top:6px;transform:translateX(-50%);font-size:10px;letter-spacing:.22em;color:#9fb8dd;white-space:nowrap}
+  .colhead{position:absolute;top:38px;transform:translateX(-50%);font-size:10px;letter-spacing:.22em;color:#9fb8dd;white-space:nowrap;z-index:4}
+  .colhead.nl{transform:translateX(0)}
+  .colhead.nr{transform:translateX(-100%)}
   .colhead b{color:var(--case);font-weight:800;transition:color .8s}
   .node{position:absolute;transform:translate(-50%,-50%);font-size:10.5px;letter-spacing:.03em;color:#dceaff;white-space:nowrap;text-shadow:0 1px 6px #000;z-index:3}
   .node::before{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;background:#fff;box-shadow:0 0 8px #fff,0 0 14px var(--nc,#fff);margin-right:6px;vertical-align:2px}
   .node small{display:block;font-size:8px;color:var(--mut);margin-left:11px;letter-spacing:.05em}
-  .node.nl{transform:translate(-10%,-50%)}
+  .node.nl{transform:translate(-2%,-50%)}
   .node.nr{transform:translate(-90%,-50%)}
   .node.hot{outline:1.5px solid var(--case);outline-offset:5px;border-radius:2px;background:rgba(0,0,0,.45);box-shadow:0 0 22px var(--case-dim),inset 0 0 12px rgba(0,0,0,.6);padding:3px 7px;transition:outline-color .8s,box-shadow .8s}
   .node.hot small{color:#ffb3ba}
@@ -229,15 +231,15 @@ var LOGPOOL = [
 var chipsEl = document.getElementById('chips');
 var stage = document.getElementById('stageWrap');
 var nodes = [], edges = [];
-var colX = [0.115, 0.305, 0.50, 0.695, 0.885];
+var colX = [0.13, 0.315, 0.50, 0.685, 0.87];
 COLS.forEach(function(col, ci){
   var hd = document.createElement('div');
-  hd.className = 'colhead mono'; hd.style.left = (colX[ci]*100)+'%';
+  hd.className = 'colhead mono' + (ci===0?' nl':(ci===4?' nr':'')); hd.style.left = (colX[ci]*100)+'%';
   hd.innerHTML = col.h.replace(/^(\d+ · )/, '<b>$1</b>');
   chipsEl.appendChild(hd);
   col.nodes.forEach(function(nd, ni){
     var x = colX[ci] + (Math.sin(ni*2.7+ci)*0.012);
-    var y = 0.115 + ni*0.128 + Math.sin(ni*1.9+ci*3)*0.016;
+    var y = 0.14 + ni*0.12 + Math.sin(ni*1.9+ci*3)*0.014;
     var el = document.createElement('div');
     el.className = 'node mono' + (ci===0?' nl':(ci===4?' nr':'')); el.style.left = (x*100)+'%'; el.style.top = (y*100)+'%';
     el.style.setProperty('--nc', CASES[0].color);
@@ -266,7 +268,7 @@ for (var s=0; s<130; s++) stars.push({x:Math.random(), y:Math.random(), r:Math.r
 /* ============ CANVAS ============ */
 var cv = document.getElementById('web'), ctx = cv.getContext('2d');
 var W=0, H=0;
-function fit(){ var r = stage.getBoundingClientRect(); W = cv.width = r.width+180; H = cv.height = r.height+140; }
+function fit(){ var r = stage.getBoundingClientRect(); W = cv.width = r.width+80; H = cv.height = r.height+60; }
 fit(); window.addEventListener('resize', fit);
 
 var pulses = [];
@@ -297,9 +299,9 @@ function frame(now){
   /* camera: drift to case region + breathing wander */
   camX += (camTX-camX)*0.012; camY += (camTY-camY)*0.012;
   var wx = camX + Math.sin(now*0.00011)*0.04, wy = camY + Math.cos(now*0.00009)*0.035;
-  var zoom = 1.10 + Math.sin(now*0.00013)*0.04;
+  var zoom = 1.05 + Math.sin(now*0.00013)*0.02;
   var cam = document.getElementById('cam');
-  cam.style.transform = 'translate('+((0.5-wx)*72)+'px,'+((0.5-wy)*48)+'px) scale('+zoom+')';
+  cam.style.transform = 'translate('+((0.5-wx)*52)+'px,'+((0.5-wy)*34)+'px) scale('+zoom+')';
 
   ctx.clearRect(0,0,W,H);
   ctx.globalCompositeOperation = 'lighter';
@@ -324,7 +326,7 @@ function frame(now){
   });
 
   /* vertical energy streams between columns */
-  var bounds = [0.21, 0.4025, 0.5975, 0.79];
+  var bounds = [0.2225, 0.4075, 0.5925, 0.7775];
   bounds.forEach(function(bx, bi){
     var cx = bx*W, ph = now*0.0016 + bi*1.7;
     ctx.strokeStyle = rgba(colCur, 0.07); ctx.lineWidth = 34; streamPath(cx, 18, ph);
